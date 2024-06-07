@@ -101,4 +101,45 @@ router.post("/addNewUser", superAdminAuthMiddleware, async (req, res) => {
   }
 });
 
+// User Login
+router.post("/login", async (req, res) => {
+  const { email, password } = req.body;
+
+  // Check if email and password are provided
+  if (!email || !password) {
+    return res.status(400).json({ message: "Email and password are required" });
+  }
+
+  try {
+    // Find the user by email
+    const user = await User.findOne({ email });
+
+    // If user not found, return error
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    // Compare password
+    const isPasswordValid = await bcrypt.compare(password, user.password);
+
+    // If password is invalid, return error
+    if (!isPasswordValid) {
+      return res.status(401).json({ message: "Invalid password" });
+    }
+
+    // Generate JWT token
+    const token = jwt.sign(
+      { email: user.email, role: user.role },
+      secretKey,
+      { expiresIn: "1w" }
+    );
+
+    // Return token
+    res.status(200).json({ message: "Login successful", token });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+
 module.exports = router;
