@@ -27,7 +27,6 @@ router.get("/users/:id", superAdminAuthMiddleware, async (req, res) => {
   }
 });
 
-//   Delete user by ID
 
 // Delete User by ID
 router.delete("/users/:id", superAdminAuthMiddleware, async (req, res) => {
