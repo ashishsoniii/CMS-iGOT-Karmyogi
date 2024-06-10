@@ -14,8 +14,10 @@ import InputAdornment from "@mui/material/InputAdornment";
 import Logo from "../../components/logo/logo.jsx";
 import Iconify from "../../components/iconify/iconify.jsx";
 
+import { useRouter } from '../../routes/hooks';
 
 export function LoginView() {
+  const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
@@ -24,7 +26,7 @@ export function LoginView() {
   const handleLogin = async () => {
     try {
       const response = await axios.post(
-        "http://localhost:3001/auth/adminLogin",
+        "http://localhost:3001/auth/login",
         {
           email,
           password,
@@ -33,9 +35,7 @@ export function LoginView() {
 
       if (response.status === 200) {
         localStorage.setItem("token", response.data.token);
-        localStorage.setItem("email", response.data.email);
-        localStorage.setItem("name", response.data.name);
-        localStorage.setItem("phone", response.data.phone);
+        router.push('../');
       } else {
         console.error("Login failed:", response.data.error);
       }
