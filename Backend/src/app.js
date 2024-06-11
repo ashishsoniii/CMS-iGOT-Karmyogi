@@ -1,6 +1,7 @@
 const express = require("express");
 const mongoose = require("mongoose");
 const authRoutes = require("./routes/authRoutes");
+const userManagementRoutes = require("./routes/userManagementRoutes");
 const cors = require("cors");
 
 // Import the database configuration
@@ -15,6 +16,7 @@ app.use(cors());
 
 // Routes
 app.use("/auth", authRoutes);
+app.use("/user", userManagementRoutes);
 
 app.get("/", (req, res) => {
   res.send(`<h1>Home Page</h1>`);
