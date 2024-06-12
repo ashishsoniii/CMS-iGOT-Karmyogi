@@ -112,8 +112,7 @@ export function LoginView() {
     <Box
       sx={{
         backdropFilter: "blur(10px)",
-        // backgroundImage: "linear-gradient(to bottom right, #fffdaf, white)",
-        backgroundImage: "url('/bg_overlay.jpg')",
+        backgroundImage: "linear-gradient(to bottom right, #fffdaf, white)",
         height: "100vh",
         display: "flex",
         alignItems: "center",
