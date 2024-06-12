@@ -1,10 +1,11 @@
-import { lazy, Suspense } from 'react';
-import { Outlet, Navigate, useRoutes } from 'react-router-dom';
+import { lazy, Suspense } from "react";
+import { Outlet, Navigate, useRoutes } from "react-router-dom";
 
-import DashboardLayout from '../layouts/dashboard';
+import DashboardLayout from "../layouts/dashboard";
 
-export const IndexPage = lazy(() => import('../pages/app'));
-export const LoginPage = lazy(() => import('../pages/login'));
+const IndexPage = lazy(() => import("../pages/app"));
+const LoginPage = lazy(() => import("../pages/login"));
+const UserManagementPage = lazy(() => import("../pages/userManagement"));
 
 // ----------------------------------------------------------------------
 
@@ -18,14 +19,17 @@ export default function Router() {
           </Suspense>
         </DashboardLayout>
       ),
-      children: [{ element: <IndexPage />, index: true }],
+      children: [
+        { element: <IndexPage />, index: true },
+        { element: <UserManagementPage />, path: "user" },
+      ],
     },
     {
-      path: 'login',
+      path: "login",
       element: <LoginPage />,
     },
     {
-      path: '*',
+      path: "*",
       element: <Navigate to="/404" replace />,
     },
   ]);
