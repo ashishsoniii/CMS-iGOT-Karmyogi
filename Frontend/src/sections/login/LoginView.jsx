@@ -10,11 +10,11 @@ import Typography from "@mui/material/Typography";
 import IconButton from "@mui/material/IconButton";
 import LoadingButton from "@mui/lab/LoadingButton";
 import InputAdornment from "@mui/material/InputAdornment";
+import { Icon } from "@iconify/react";
 
-import Logo from "../../components/logo/logo.jsx";
-import Iconify from "../../components/iconify/iconify.jsx";
+import logo3 from "../../assets/igot_complete.svg";
 
-import { useRouter } from '../../routes/hooks';
+import { useRouter } from "../../routes/hooks";
 
 export function LoginView() {
   const router = useRouter();
@@ -25,17 +25,14 @@ export function LoginView() {
 
   const handleLogin = async () => {
     try {
-      const response = await axios.post(
-        "http://localhost:3001/auth/login",
-        {
-          email,
-          password,
-        }
-      );
+      const response = await axios.post("http://localhost:3001/auth/login", {
+        email,
+        password,
+      });
 
       if (response.status === 200) {
         localStorage.setItem("token", response.data.token);
-        router.push('../');
+        router.push("../");
       } else {
         console.error("Login failed:", response.data.error);
       }
@@ -67,8 +64,11 @@ export function LoginView() {
                   onClick={() => setShowPassword(!showPassword)}
                   edge="end"
                 >
-                  <Iconify
+                  <Box
+                    component={Icon}
+                    className="component-iconify"
                     icon={showPassword ? "eva:eye-fill" : "eva:eye-off-fill"}
+                    sx={{ width: 20, height: 20 }}
                   />
                 </IconButton>
               </InputAdornment>
@@ -122,14 +122,23 @@ export function LoginView() {
         backgroundPosition: "center",
       }}
     >
-      <Logo
+      <Box
+        component="div"
         sx={{
+          width: 40,
+          height: 40,
           position: "fixed",
           top: { xs: 16, md: 24 },
           left: { xs: 16, md: 24 },
-        }}
-      />
 
+          display: "inline-flex",
+        }}
+        onClick={() => {
+          window.location.href = "/";
+        }}
+      >
+        <img src={logo3} alt="igot" style={{ cursor: "pointer" }} />
+      </Box>
       <Stack
         alignItems="center"
         justifyContent="center"
@@ -167,6 +176,5 @@ export function LoginView() {
     </Box>
   );
 }
-
 
 export default LoginView;
