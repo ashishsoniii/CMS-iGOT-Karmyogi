@@ -24,42 +24,6 @@ const NAV_WIDTH_LARGE = 280;
 const NAV_WIDTH_MOBILE = 230;
 
 // ----------------------------------------------------------------------
-
-// Inline Logo component
-function Logo({ disabledLink = false }) {
-  const logo = (
-    <Box
-      component="div"
-      sx={{
-        width: 40,
-        height: 40,
-
-        display: "inline-flex",
-      }}
-      onClick={() => {
-        window.location.href = "/";
-      }}
-    >
-      <img src={logo3} alt="igot" style={{ cursor: "pointer" }} />
-    </Box>
-  );
-
-  if (disabledLink) {
-    return logo;
-  }
-
-  return (
-    <Link component={RouterLink} href="/" sx={{ display: "contents" }}>
-      {logo}
-    </Link>
-  );
-}
-
-Logo.propTypes = {
-  disabledLink: PropTypes.bool,
-  sx: PropTypes.object,
-};
-
 export default function Nav({ openNav, onCloseNav }) {
   const theme = useTheme();
   const pathname = usePathname();
@@ -108,7 +72,19 @@ export default function Nav({ openNav, onCloseNav }) {
   const renderContent = (
     <>
       <Box sx={{ mt: 3, mb: 2, mx: 4 }}>
-        <Logo />
+        {/* NavLogo */}
+        <Link component={RouterLink} href="/" sx={{ display: "contents" }}>
+          <Box
+            component="div"
+            sx={{
+              width: 40,
+              height: 40,
+              display: "inline-flex",
+            }}
+          >
+            <img src={logo3} alt="igot" style={{ cursor: "pointer" }} />
+          </Box>{" "}
+        </Link>
       </Box>
 
       {renderAccount}
