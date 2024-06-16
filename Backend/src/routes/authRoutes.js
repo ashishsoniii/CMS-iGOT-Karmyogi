@@ -35,6 +35,7 @@ router.post("/addSuperAdmin", async (req, res) => {
       email,
       phone,
       password: hashedPassword,
+      status: "active",
       role: "super admin",
     });
 
@@ -60,7 +61,7 @@ router.post("/addNewUser", superAdminAuthMiddleware, async (req, res) => {
   const { name, email, phone, password, role } = req.body;
 
   // Check if all required fields are provided
-  if (!name || !email || !phone || !password || !role ) {
+  if (!name || !email || !phone || !password || !role) {
     return res.status(400).json({ message: "All fields are required" });
   }
 
@@ -82,6 +83,7 @@ router.post("/addNewUser", superAdminAuthMiddleware, async (req, res) => {
       name,
       email,
       phone,
+      status: "active",
       password: hashedPassword,
       role,
     });
@@ -119,6 +121,11 @@ router.post("/login", async (req, res) => {
       return res.status(404).json({ message: "User not found" });
     }
 
+    // Check if the user is active
+    if (user.status !== "active") {
+      return res.status(403).json({ message: "User account is not active" });
+    }
+
     // Compare password
     const isPasswordValid = await bcrypt.compare(password, user.password);
 
@@ -128,11 +135,9 @@ router.post("/login", async (req, res) => {
     }
 
     // Generate JWT token
-    const token = jwt.sign(
-      { email: user.email, role: user.role },
-      secretKey,
-      { expiresIn: "1w" }
-    );
+    const token = jwt.sign({ email: user.email, role: user.role }, secretKey, {
+      expiresIn: "1w",
+    });
 
     // Return token
     res.status(200).json({ message: "Login successful", token });
@@ -140,6 +145,5 @@ router.post("/login", async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 });
-
 
 module.exports = router;
