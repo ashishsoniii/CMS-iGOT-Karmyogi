@@ -1,4 +1,5 @@
 import { useState } from "react";
+import PropTypes from "prop-types";
 
 import Box from "@mui/material/Box";
 import Avatar from "@mui/material/Avatar";
@@ -22,7 +23,7 @@ const MENU_OPTIONS = [
 
 // ----------------------------------------------------------------------
 
-export default function AccountPopover() {
+export default function AccountPopover({ userData }) {
   const [open, setOpen] = useState(null);
 
   const handleOpen = (event) => {
@@ -38,6 +39,10 @@ export default function AccountPopover() {
   const handleClose = () => {
     setOpen(null);
   };
+
+  if (!userData) {
+    return null; // Render nothing if userData is null or undefined
+  }
 
   return (
     <>
@@ -56,7 +61,7 @@ export default function AccountPopover() {
             border: "solid 2px #ffffff",
           }}
         >
-          {"Ashish Soni".charAt(0).toUpperCase()}
+          {userData.name.charAt(0).toUpperCase()}
         </Avatar>
       </IconButton>
 
@@ -69,10 +74,10 @@ export default function AccountPopover() {
       >
         <Box sx={{ my: 1.5, px: 2 }}>
           <Typography variant="subtitle2" noWrap>
-            {"Ashish Soni"}
+            {userData.name}
           </Typography>
           <Typography variant="body2" sx={{ color: "text.secondary" }} noWrap>
-            {"ashishsoni2002@gmail.com"}
+            {userData.email}
           </Typography>
         </Box>
 
@@ -98,3 +103,10 @@ export default function AccountPopover() {
     </>
   );
 }
+
+AccountPopover.propTypes = {
+  userData: PropTypes.shape({
+    name: PropTypes.string.isRequired,
+    email: PropTypes.string.isRequired,
+  }),
+};
