@@ -22,6 +22,7 @@ export function LoginView() {
   const [password, setPassword] = useState("");
 
   const [showPassword, setShowPassword] = useState(false);
+  const [error, setError] = useState(null);
 
   const handleLogin = async () => {
     try {
@@ -38,6 +39,7 @@ export function LoginView() {
       }
     } catch (error) {
       console.error("Error:", error);
+      setError(error.response.data.message);
     }
   };
 
@@ -77,6 +79,16 @@ export function LoginView() {
         />
       </Stack>
 
+      {error && (
+        <Stack
+          direction="row"
+          alignItems="center"
+          justifyContent="flex-start"
+          sx={{ my: 2, color: "red" }}
+        >
+          <p>{error}</p>
+        </Stack>
+      )}
       <Stack
         direction="row"
         alignItems="center"
