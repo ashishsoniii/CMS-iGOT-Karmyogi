@@ -1,14 +1,21 @@
 const express = require("express");
 const User = require("../models/User");
-const superAdminAuthMiddleware = require("../middleware/authMiddleware");
+const authMiddleware = require("../middleware/authMiddleware");
 const bcrypt = require("bcrypt");
 
 const router = express.Router();
 
-// Get All Users
-router.get("/users", superAdminAuthMiddleware, async (req, res) => {
+// Get All Users - depending on user's role
+router.get("/users", authMiddleware(["super admin", "admin"]), async (req, res) => {
   try {
-    const users = await User.find().select("-password"); // Exclude the password field
+    let users;
+    if (req.user.role === "super admin") {
+      users = await User.find().select("-password"); // Super admin sees all users
+    } else if (req.user.role === "admin") {
+      users = await User.find({ role: { $in: ["editor"] } }).select("-password"); // Admin sees just editors
+    } else {
+      users = []; // Editors see no users
+    }
     res.status(200).json({ users });
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -16,7 +23,7 @@ router.get("/users", superAdminAuthMiddleware, async (req, res) => {
 });
 
 // Get User by ID
-router.get("/users/:id", superAdminAuthMiddleware, async (req, res) => {
+router.get("/users/:id", authMiddleware(["super admin", "admin"]), async (req, res) => {
   try {
     const user = await User.findById(req.params.id).select("-password"); // Exclude the password field
     if (!user) {
@@ -29,7 +36,7 @@ router.get("/users/:id", superAdminAuthMiddleware, async (req, res) => {
 });
 
 // Delete User by ID
-router.delete("/users/:id", superAdminAuthMiddleware, async (req, res) => {
+router.delete("/users/:id", authMiddleware(["super admin", "admin"]), async (req, res) => {
   try {
     const user = await User.findByIdAndDelete(req.params.id);
 
@@ -44,7 +51,7 @@ router.delete("/users/:id", superAdminAuthMiddleware, async (req, res) => {
 });
 
 // Update User by ID
-router.put("/users/:id", superAdminAuthMiddleware, async (req, res) => {
+router.put("/users/:id", authMiddleware(["super admin", "admin"]), async (req, res) => {
   const { name, email, phone, role } = req.body;
 
   try {
@@ -72,7 +79,7 @@ router.put("/users/:id", superAdminAuthMiddleware, async (req, res) => {
 // Update User Password by only Super Admin
 router.put(
   "/users/:id/password",
-  superAdminAuthMiddleware,
+  authMiddleware(["super admin"]),
   async (req, res) => {
     const { password } = req.body;
 
@@ -107,7 +114,7 @@ router.put(
 // Activate User by ID
 router.put(
   "/users/:id/activate",
-  superAdminAuthMiddleware,
+  authMiddleware(["super admin", "admin"]),
   async (req, res) => {
     try {
       const user = await User.findById(req.params.id);
@@ -130,7 +137,7 @@ router.put(
 // Deactivate User by ID
 router.put(
   "/users/:id/deactivate",
-  superAdminAuthMiddleware,
+  authMiddleware(["super admin", "admin"]),
   async (req, res) => {
     try {
       const user = await User.findById(req.params.id);

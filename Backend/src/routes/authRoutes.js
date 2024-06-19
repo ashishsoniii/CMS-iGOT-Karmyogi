@@ -2,10 +2,10 @@ const express = require("express");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const User = require("../models/User");
-const superAdminAuthMiddleware = require("../middleware/authMiddleware");
+const authMiddleware = require("../middleware/authMiddleware");
 
 const router = express.Router();
-const secretKey = "admin123"; // Enter a secure secret key
+const secretKey = "admin123";
 
 // Super Admin Registration
 router.post("/addSuperAdmin", async (req, res) => {
@@ -57,7 +57,7 @@ router.post("/addSuperAdmin", async (req, res) => {
 });
 
 // User Registration (only accessible by super admins)
-router.post("/addNewUser", superAdminAuthMiddleware, async (req, res) => {
+router.post("/addNewUser", authMiddleware(["super admin", "admin"]), async (req, res) => {
   const { name, email, phone, password, role } = req.body;
 
   // Check if all required fields are provided
