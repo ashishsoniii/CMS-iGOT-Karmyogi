@@ -1,6 +1,6 @@
 import axios from "axios";
 import PropTypes from "prop-types";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 
 import Grid from "@mui/material/Grid";
 import Button from "@mui/material/Button";
@@ -20,6 +20,19 @@ export default function NewUserForm({ setClickedTitle }) {
   });
 
   const [error, setError] = useState(null);
+
+  const [currentUserData, setCurrentUserDate] = useState(null); // this isis current user's data - token, role, name, email.
+
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (token) {
+      const tokenParts = token.split(".");
+      if (tokenParts.length === 3) {
+        const payload = JSON.parse(atob(tokenParts[1]));
+        setCurrentUserDate(payload);
+      }
+    }
+  }, []);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -121,11 +134,17 @@ export default function NewUserForm({ setClickedTitle }) {
           required
           sx={{ mb: 2 }}
         >
-          {roles.map((role) => (
-            <MenuItem key={role} value={role}>
-              {role}
+          {currentUserData && currentUserData.role == "super admin" ? (
+            roles.map((role) => (
+              <MenuItem key={role} value={role}>
+                {role}
+              </MenuItem>
+            ))
+          ) : (
+            <MenuItem key={"editor"} value={"editor"}>
+              {"editor"}
             </MenuItem>
-          ))}
+          )}
         </TextField>
       </Grid>
       <Grid item xs={12} sm={6} md={3}>
