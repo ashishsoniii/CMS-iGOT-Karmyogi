@@ -54,8 +54,7 @@ export default function UserTableRow({
       const token = localStorage.getItem("token");
 
       // Send DELETE request to delete the user
-      const response = await axios.delete(
-        `http://localhost:3001/user/users/${id}`,
+      const response = await axios.delete(`${import.meta.env.VITE_BACKEND_URL}/user/users/${id}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -78,8 +77,7 @@ export default function UserTableRow({
     try {
       setOpen(null);
       const token = localStorage.getItem("token");
-      const response = await axios.put(
-        `http://localhost:3001/user/users/${id}/activate`,
+      const response = await axios.put(`${import.meta.env.VITE_BACKEND_URL}/user/users/${id}/activate`,
         null,
         {
           headers: {
@@ -100,8 +98,7 @@ export default function UserTableRow({
     try {
       setOpen(null);
       const token = localStorage.getItem("token");
-      const response = await axios.put(
-        `http://localhost:3001/user/users/${id}/deactivate`,
+      const response = await axios.put(`${import.meta.env.VITE_BACKEND_URL}/user/users/${id}/deactivate`,
         null,
         {
           headers: {

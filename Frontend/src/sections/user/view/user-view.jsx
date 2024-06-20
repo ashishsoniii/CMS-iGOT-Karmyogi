@@ -55,7 +55,7 @@ export default function UserPage() {
   const fetchUsers = useCallback(async () => {
     try {
       const token = localStorage.getItem("token");
-      const response = await axios.get(`http://localhost:3001/user/users`, {
+      const response = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/user/users`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },

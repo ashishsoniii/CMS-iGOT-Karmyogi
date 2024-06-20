@@ -43,8 +43,7 @@ function UserEditDialog({
     try {
       const token = localStorage.getItem("token");
 
-      const response = await axios.put(
-        `http://localhost:3001/user/users/${id}`,
+      const response = await axios.put(`${import.meta.env.VITE_BACKEND_URL}/user/users/${id}`,
         userData,
         {
           headers: {

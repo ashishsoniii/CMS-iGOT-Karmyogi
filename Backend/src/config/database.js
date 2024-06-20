@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 require('dotenv').config(); // Load environment variables from .env file
 
-const mongoURI = "mongodb+srv://soni:1234567890@igot.lvt1lby.mongodb.net/iGOT_CMS?retryWrites=true&w=majority";
+const mongoURI = process.env.MONGO_URI;
 
 async function connectToDatabase() {
   try {

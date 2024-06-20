@@ -43,7 +43,7 @@ export default function NewUserForm({ setClickedTitle }) {
     try {
       const token = localStorage.getItem("token");
       const response = await axios.post(
-        "http://localhost:3001/auth/addNewUser",
+        `${import.meta.env.VITE_BACKEND_URL}/auth/addNewUser`,
         userData,
         {
           headers: {

@@ -38,7 +38,7 @@ function UserNewPasswordDialog({
 
       // Send PUT request to update the user's email
       const emailResponse = await axios.put(
-        `http://localhost:3001/user/users/${id}/password`,
+        `${import.meta.env.VITE_BACKEND_URL}/user/users/${id}/password`,
         { email, password },
         {
           headers: {
@@ -50,7 +50,7 @@ function UserNewPasswordDialog({
       if (password) {
         // Send PUT request to update the user's password
         const passwordResponse = await axios.put(
-          `http://localhost:3001/user/users/${id}/password`,
+          `${import.meta.env.VITE_BACKEND_URL}/user/users/${id}/password`,
           { password },
           {
             headers: {
