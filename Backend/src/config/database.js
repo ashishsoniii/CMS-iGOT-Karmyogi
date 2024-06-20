@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 
 //  MongoDB connection URI 
-const mongoURI = "mongodb://127.0.0.1:27017/iGOT_CMS";
+const mongoURI = "mongodb+srv://soni:1234567890@igot.lvt1lby.mongodb.net/iGOT_CMS";
 
 mongoose.connect(mongoURI, {
   useNewUrlParser: true,
