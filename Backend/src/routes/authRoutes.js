@@ -3,6 +3,8 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const User = require("../models/User");
 const authMiddleware = require("../middleware/authMiddleware");
+const { sendEmail } = require("./sendEmail");
+const {newUserHTMLTemplate} = require('./emailTemplates/newUserHTMLTemplate')
 
 const router = express.Router();
 const secretKey = "admin123";
@@ -87,7 +89,20 @@ router.post("/addNewUser", authMiddleware(["super admin", "admin"]), async (req,
       password: hashedPassword,
       role,
     });
+  
+    const subject = "Welcome to the iGOT KarmaYogi!";
+    
+    const userEmailTemplateHtml = newUserHTMLTemplate({name,email,phone,password,role})
 
+    const emailSend = await sendEmail(email,subject,userEmailTemplateHtml);
+
+    if (!emailSend) {
+      console.log("Failed to send email & adding user");
+      return res
+      .status(500)
+      .json({ error: "Failed to send email & adding user" });
+    }
+    
     await newUser.save();
 
     // Generating JWT token
