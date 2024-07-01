@@ -20,12 +20,17 @@ export function LoginView() {
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-
+  
   const [showPassword, setShowPassword] = useState(false);
+  const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(false); // Add loading state
 
   const handleLogin = async () => {
+    setLoading(true); 
+    setError(null);
+
     try {
-      const response = await axios.post("http://localhost:3001/auth/login", {
+      const response = await axios.post(`${import.meta.env.VITE_BACKEND_URL}/auth/login`, {
         email,
         password,
       });
@@ -38,6 +43,9 @@ export function LoginView() {
       }
     } catch (error) {
       console.error("Error:", error);
+      setError(error.response?.data?.message || "An error occurred");
+    } finally {
+      setLoading(false); 
     }
   };
 
@@ -77,6 +85,16 @@ export function LoginView() {
         />
       </Stack>
 
+      {error && (
+        <Stack
+          direction="row"
+          alignItems="center"
+          justifyContent="flex-start"
+          sx={{ my: 2, color: "red" }}
+        >
+          <p>{error}</p>
+        </Stack>
+      )}
       <Stack
         direction="row"
         alignItems="center"
@@ -94,6 +112,7 @@ export function LoginView() {
         type="submit"
         variant="contained"
         onClick={handleLogin}
+        loading={loading} 
         sx={{
           backgroundColor: "black",
           borderRadius: 2,

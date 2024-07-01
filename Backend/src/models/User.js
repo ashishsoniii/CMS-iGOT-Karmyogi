@@ -1,46 +1,51 @@
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
 // user schema
 const userSchema = new Schema({
   name: {
     type: String,
-    required: true
+    required: true,
   },
   email: {
     type: String,
     required: true,
-    match: [/.+\@.+\..+/, 'Please fill a valid email address']
+    match: [/.+\@.+\..+/, "Please fill a valid email address"],
   },
   phone: {
     type: String,
-    required: true
+    required: true,
+  },
+  status: {
+    type: String,
+    enum: ["active", "deactive"],
+    required: true,
   },
   password: {
     type: String,
-    required: true
+    required: true,
   },
   role: {
     type: String,
-    enum: ['admin', 'editor', 'super admin'],
-    required: true
+    enum: ["admin", "editor", "super admin"],
+    required: true,
   },
   createdAt: {
     type: Date,
-    default: Date.now
+    default: Date.now,
   },
   updatedAt: {
     type: Date,
-    default: Date.now
-  }
+    default: Date.now,
+  },
 });
 
 // pre-save hook to update the updatedAt field
-userSchema.pre('save', function(next) {
+userSchema.pre("save", function (next) {
   this.updatedAt = Date.now();
   next();
 });
 
-const User = mongoose.model('User', userSchema);
+const User = mongoose.model("User", userSchema);
 
 module.exports = User;

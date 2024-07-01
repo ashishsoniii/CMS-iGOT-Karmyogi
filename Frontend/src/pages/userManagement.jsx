@@ -1,5 +1,5 @@
 import { Helmet } from "react-helmet-async";
-import UserView from "../sections/userManagement/UserView";
+import UserView from "../sections/user/view/user-view";
 
 export default function userManagement() {
   return (
@@ -9,6 +9,7 @@ export default function userManagement() {
       </Helmet>
 
       <UserView />
+      
     </>
   );
 }

@@ -17,7 +17,7 @@ const NAV_WIDTH = 280;
 
 // ----------------------------------------------------------------------
 
-export default function Header({ onOpenNav }) {
+export default function Header({ onOpenNav,userData }) {
   const theme = useTheme();
   const lgUp = useMediaQuery(theme.breakpoints.up("lg"));
 
@@ -39,7 +39,7 @@ export default function Header({ onOpenNav }) {
       <Stack direction="row" alignItems="center" spacing={1}>
         {/* <LanguagePopover /> */}
         {/* <NotificationsPopover /> */}
-        <AccountPopover />
+        <AccountPopover userData={userData} />
       </Stack>
     </>
   );
@@ -64,4 +64,5 @@ export default function Header({ onOpenNav }) {
 
 Header.propTypes = {
   onOpenNav: PropTypes.func,
+  userData: PropTypes.any,
 };

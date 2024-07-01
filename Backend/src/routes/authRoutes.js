@@ -2,10 +2,12 @@ const express = require("express");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const User = require("../models/User");
-const superAdminAuthMiddleware = require("../middleware/authMiddleware");
+const authMiddleware = require("../middleware/authMiddleware");
+const { sendEmail } = require("./sendEmail");
+const {newUserHTMLTemplate} = require('./emailTemplates/newUserHTMLTemplate')
 
 const router = express.Router();
-const secretKey = "admin123"; // Enter a secure secret key
+const secretKey = "admin123";
 
 // Super Admin Registration
 router.post("/addSuperAdmin", async (req, res) => {
@@ -35,6 +37,7 @@ router.post("/addSuperAdmin", async (req, res) => {
       email,
       phone,
       password: hashedPassword,
+      status: "active",
       role: "super admin",
     });
 
@@ -56,11 +59,11 @@ router.post("/addSuperAdmin", async (req, res) => {
 });
 
 // User Registration (only accessible by super admins)
-router.post("/addNewUser", superAdminAuthMiddleware, async (req, res) => {
+router.post("/addNewUser", authMiddleware(["super admin", "admin"]), async (req, res) => {
   const { name, email, phone, password, role } = req.body;
 
   // Check if all required fields are provided
-  if (!name || !email || !phone || !password || !role ) {
+  if (!name || !email || !phone || !password || !role) {
     return res.status(400).json({ message: "All fields are required" });
   }
 
@@ -82,10 +85,24 @@ router.post("/addNewUser", superAdminAuthMiddleware, async (req, res) => {
       name,
       email,
       phone,
+      status: "active",
       password: hashedPassword,
       role,
     });
+  
+    const subject = "Welcome to the iGOT KarmaYogi!";
+    
+    const userEmailTemplateHtml = newUserHTMLTemplate({name,email,phone,password,role})
 
+    const emailSend = await sendEmail(email,subject,userEmailTemplateHtml);
+
+    if (!emailSend) {
+      console.log("Failed to send email & adding user");
+      return res
+      .status(500)
+      .json({ error: "Failed to send email & adding user" });
+    }
+    
     await newUser.save();
 
     // Generating JWT token
@@ -119,6 +136,11 @@ router.post("/login", async (req, res) => {
       return res.status(404).json({ message: "User not found" });
     }
 
+    // Check if the user is active
+    if (user.status !== "active") {
+      return res.status(403).json({ message: "User account is not active" });
+    }
+
     // Compare password
     const isPasswordValid = await bcrypt.compare(password, user.password);
 
@@ -129,9 +151,11 @@ router.post("/login", async (req, res) => {
 
     // Generate JWT token
     const token = jwt.sign(
-      { email: user.email, role: user.role },
+      { name: user.name, email: user.email, role: user.role },
       secretKey,
-      { expiresIn: "1w" }
+      {
+        expiresIn: "1w",
+      }
     );
 
     // Return token
@@ -140,6 +164,5 @@ router.post("/login", async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 });
-
 
 module.exports = router;

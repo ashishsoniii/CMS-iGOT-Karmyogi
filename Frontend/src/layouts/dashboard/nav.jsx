@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import PropTypes from "prop-types";
 
 import Box from "@mui/material/Box";
@@ -24,7 +24,7 @@ const NAV_WIDTH_LARGE = 280;
 const NAV_WIDTH_MOBILE = 230;
 
 // ----------------------------------------------------------------------
-export default function Nav({ openNav, onCloseNav }) {
+export default function Nav({ openNav, onCloseNav,userData }) {
   const theme = useTheme();
   const pathname = usePathname();
 
@@ -36,7 +36,7 @@ export default function Nav({ openNav, onCloseNav }) {
     }
   }, [pathname]);
 
-  const renderAccount = (
+  const renderAccount = userData ? (
     <Box
       sx={{
         my: 3,
@@ -52,14 +52,14 @@ export default function Nav({ openNav, onCloseNav }) {
       <Avatar src={logoImage} alt="photoURL" />
 
       <Box sx={{ ml: 2 }}>
-        <Typography variant="subtitle2">Ashish Soni</Typography>
+        <Typography variant="subtitle2">{userData.name}</Typography>
 
         <Typography variant="body2" sx={{ color: "text.secondary" }}>
-          Admin
+          {userData.role}
         </Typography>
       </Box>
     </Box>
-  );
+  ) : null;
 
   const renderMenu = (
     <Stack component="nav" spacing={0.5} sx={{ px: 2 }}>
@@ -125,6 +125,7 @@ export default function Nav({ openNav, onCloseNav }) {
 Nav.propTypes = {
   openNav: PropTypes.bool,
   onCloseNav: PropTypes.func,
+  userData: PropTypes.any,
 };
 
 // ----------------------------------------------------------------------

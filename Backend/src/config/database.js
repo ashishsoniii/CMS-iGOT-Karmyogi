@@ -1,20 +1,22 @@
-const mongoose = require("mongoose");
+const mongoose = require('mongoose');
+require('dotenv').config(); // Load environment variables from .env file
 
-//  MongoDB connection URI 
-const mongoURI = "mongodb://127.0.0.1:27017/iGOT_CMS";
+const mongoURI = process.env.MONGO_URI;
 
-mongoose.connect(mongoURI, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-});
-
-const db = mongoose.connection;
-
-db.on("error", console.error.bind(console, "MongoDB connection error:"));
-db.once("open", () => {
-  console.log("Connected to MongoDB");
-});
+async function connectToDatabase() {
+  try {
+    await mongoose.connect(mongoURI, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+    });
+    console.log('Connected to MongoDB');
+  } catch (error) {
+    console.error('MongoDB connection error:', error);
+    throw error; 
+  }
+}
 
 module.exports = {
-  mongoose, 
+  mongoose,
+  connectToDatabase,
 };
