@@ -1,6 +1,7 @@
 const express = require("express");
 const authRoutes = require("./routes/authRoutes");
 const userManagementRoutes = require("./routes/userManagementRoutes");
+const websiteRoutes = require("./routes/WebsiteRoutes");
 const cors = require("cors");
 const dbConfig = require("./config/database"); // Import the database configuration
 
@@ -14,6 +15,7 @@ app.use(cors());
 // Routes
 app.use("/auth", authRoutes);
 app.use("/user", userManagementRoutes);
+app.use("/website", websiteRoutes); 
 
 app.get("/", (req, res) => {
   res.send("<h1>Home Page</h1>");
