@@ -12,12 +12,12 @@ const navConfig = [
   {
     title: "Websites",
     path: "/websites",
-    icon: "user",
+    icon: "web",
   },
   {
     title: "Content Updater",
     path: "/ContentUpdater",
-    icon: "user",
+    icon: "doc",
   },
 ];
 
