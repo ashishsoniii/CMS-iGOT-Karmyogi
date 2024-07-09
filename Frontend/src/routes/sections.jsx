@@ -3,6 +3,7 @@ import { Outlet, Navigate, useRoutes } from "react-router-dom";
 
 import DashboardLayout from "../layouts/dashboard";
 import WebsitePage from "../pages/website";
+import ContentUpdater from "../pages/contentUpdater";
 
 const IndexPage = lazy(() => import("../pages/app"));
 const LoginPage = lazy(() => import("../pages/login"));
@@ -24,6 +25,7 @@ export default function Router() {
         { element: <IndexPage />, index: true },
         { element: <UserManagementPage />, path: "user" },
         { element: <WebsitePage />, path: "websites" },
+        { element: <ContentUpdater />, path: "contentUpdater" },
       ],
     },
     {
