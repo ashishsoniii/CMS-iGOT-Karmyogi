@@ -118,7 +118,7 @@ export default function UserPage() {
         justifyContent="space-between"
         m={6}
       >
-        <Typography variant="h4">Users</Typography>
+        <Typography variant="h4">Websites</Typography>
       </Stack>
 
       <Grid container spacing={3} m={5} gap={4}>
@@ -133,7 +133,7 @@ export default function UserPage() {
               },
             }}
             onClick={() => handleCardClick("all")}
-            icon={<img alt="icon" src="/icons/glass/ic_glass_users.png" />}
+            icon={<img alt="icon" src="/icons/glass/website.png" />}
           />
         </Grid>
         <Grid xs={12} sm={6} md={3}>
@@ -151,7 +151,7 @@ export default function UserPage() {
               <img
                 style={{ width: "4rem" }}
                 alt="icon"
-                src="/icons/glass/ic_user_add.png"
+                src="/icons/glass/addWeb.png"
               />
             }
           />
