@@ -198,6 +198,7 @@ export default function UserPage() {
                   headLabel={[
                     { id: "name", label: "Name", align: "center" },
                     { id: "url", label: "URL" },
+                    { id: "bucketName", label: "bucketName" },
                     { id: "createdAt", label: "Created Date" },
                     { id: "updatedAt", label: "Updated Date" },
                     { id: "" },

@@ -5,6 +5,10 @@ const websiteSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  bucketName: {
+    type: String,
+    required: true,
+  },
   url: {
     type: String,
     required: true,

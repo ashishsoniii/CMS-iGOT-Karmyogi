@@ -6,9 +6,9 @@ const router = express.Router();
 
 // Create a new website
 router.post('/', async (req, res) => {
-    const { name, url } = req.body;
+    const { name, url, bucketName } = req.body;
     try {
-      const website = new Website({ name, url });
+      const website = new Website({ name, url, bucketName });
       await website.save();
       res.status(201).json(website);
     } catch (error) {

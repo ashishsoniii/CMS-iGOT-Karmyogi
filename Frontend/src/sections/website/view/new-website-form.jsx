@@ -7,16 +7,18 @@ import Button from "@mui/material/Button";
 import MenuItem from "@mui/material/MenuItem";
 import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
+import CircularProgress from "@mui/material/CircularProgress"; // Import CircularProgress for loading indicator
 
-const roles = ["admin", "editor", "super admin"];
 
 export default function NewWebsiteForm({ setClickedTitle }) {
   const [websiteData, setWebsiteData] = useState({
     name: "",
     url: "",
+    bucketName: "",
   });
 
   const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(false); // State for loading
 
   const [currentUserData, setCurrentUserData] = useState(null); // this is current user's data - token, role, name, url.
 
@@ -37,6 +39,9 @@ export default function NewWebsiteForm({ setClickedTitle }) {
   };
 
   const handleSubmit = async () => {
+    setLoading(true); // Start loading
+    setError(null); // Reset error
+
     try {
       const token = localStorage.getItem("token");
       const response = await axios.post(
@@ -52,12 +57,15 @@ export default function NewWebsiteForm({ setClickedTitle }) {
       setWebsiteData({
         name: "",
         url: "",
+        bucketName: ""
       });
       setError("Website Added Successfully");
       setClickedTitle("all");
     } catch (error) {
       console.error("Error adding website:", error);
       setError(error.response.data.error);
+    } finally {
+      setLoading(false); // Stop loading
     }
   };
 
@@ -99,9 +107,27 @@ export default function NewWebsiteForm({ setClickedTitle }) {
           sx={{ mb: 2 }}
         />
       </Grid>
+      <Grid item xs={12} sm={6}>
+        <TextField
+          label="bucketName"
+          variant="outlined"
+          fullWidth
+          name="bucketName"
+          value={websiteData.bucketName}
+          onChange={handleChange}
+          required
+          sx={{ mb: 2 }}
+        />
+      </Grid>
       <Grid item xs={12} sm={6} md={3}>
-        <Button variant="contained" color="primary" onClick={handleSubmit}>
-          Add Website
+        <Button
+          variant="contained"
+          color="primary"
+          onClick={handleSubmit}
+          disabled={loading} // Disable button while loading
+          endIcon={loading && <CircularProgress size={20} />} // Show loading spinner
+        >
+          {loading ? "Adding..." : "Add Website"}
         </Button>
         {error && (
           <Typography variant="body2" color="error" sx={{ mt: 1 }}>

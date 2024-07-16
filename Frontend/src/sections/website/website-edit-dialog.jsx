@@ -19,12 +19,14 @@ function UserEditDialog({
   setConfirmationEditOpen,
   name: initialName,
   id,
-  url: initialurl,
-  fetchwebsites,
+  url: initialUrl,
+  bucketName: initialBucketName,
+  fetchUsers,
 }) {
   const [userData, setUserData] = useState({
     name: initialName,
-    url: initialurl,
+    url: initialUrl,
+    bucketName: initialBucketName,
   });
 
   const [errorshow, setError] = useState(null);
@@ -39,7 +41,7 @@ function UserEditDialog({
       const token = localStorage.getItem("token");
 
       const response = await axios.put(
-        `${import.meta.env.VITE_BACKEND_URL}/user/users/${id}`,
+        `${import.meta.env.VITE_BACKEND_URL}/website/${id}`,
         userData,
         {
           headers: {
@@ -81,7 +83,7 @@ function UserEditDialog({
           </Grid>
           <Grid item xs={12}>
             <TextField
-              label="url"
+              label="URL"
               variant="outlined"
               fullWidth
               name="url"
@@ -90,7 +92,17 @@ function UserEditDialog({
               sx={{ mb: 2 }}
             />
           </Grid>
-
+          <Grid item xs={12}>
+            <TextField
+              label="Bucket Name"
+              variant="outlined"
+              fullWidth
+              name="bucketName"
+              value={userData.bucketName}
+              onChange={handleChange}
+              sx={{ mb: 2 }}
+            />
+          </Grid>
           <Grid item xs={12}>
             {errorshow && (
               <Typography variant="body2" color="error">
@@ -117,8 +129,7 @@ UserEditDialog.propTypes = {
   isConfirmationEditOpen: PropTypes.bool.isRequired,
   name: PropTypes.string.isRequired,
   url: PropTypes.string.isRequired,
-  phone: PropTypes.string.isRequired,
-  role: PropTypes.string.isRequired,
+  bucketName: PropTypes.string.isRequired,
   id: PropTypes.string.isRequired,
   fetchUsers: PropTypes.func.isRequired,
 };

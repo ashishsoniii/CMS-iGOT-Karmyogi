@@ -23,16 +23,9 @@ import { Box } from "@mui/material";
 
 // ----------------------------------------------------------------------
 
-export default function UserTableRow({
-  selected,
-  id,
-  user,
-  fetchUsers,
-}) {
+export default function UserTableRow({ selected, id, user, fetchUsers }) {
   const [open, setOpen] = useState(null);
   const [isConfirmationDeleteOpen, setConfirmationOpen] = useState(false);
-  const [isGenerateNewPasswordOpen, setGenerateNewPasswordOpen] =
-    useState(false);
   const [isConfirmationActivateOpen, setConfirmationActivateOpen] =
     useState(false);
   const [isConfirmationEditOpen, setConfirmationEditOpen] = useState(false);
@@ -51,7 +44,8 @@ export default function UserTableRow({
       const token = localStorage.getItem("token");
 
       // Send DELETE request to delete the user
-      const response = await axios.delete(`${import.meta.env.VITE_BACKEND_URL}/website/${id}`,
+      const response = await axios.delete(
+        `${import.meta.env.VITE_BACKEND_URL}/website/${id}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -81,13 +75,13 @@ export default function UserTableRow({
         </TableCell>
 
         <TableCell>{user.url}</TableCell>
+        <TableCell>{user.bucketName}</TableCell>
         <TableCell>
           {new Date(user.createdAt).toISOString().slice(0, 10).split("T")[0]}
         </TableCell>
         <TableCell>
           {new Date(user.updatedAt).toISOString().slice(0, 10).split("T")[0]}
         </TableCell>
-
 
         <TableCell align="right">
           <IconButton onClick={handleOpenMenu}>
@@ -123,23 +117,6 @@ export default function UserTableRow({
         >
           Delete
         </MenuItem>
-
-        <MenuItem
-          onClick={() => setGenerateNewPasswordOpen(true)}
-          sx={{ color: "primary.main" }}
-        >
-          Generate New Password
-        </MenuItem>
-
-        {user.status === "active" ? (
-          <MenuItem onClick={() => setConfirmationActivateOpen(true)}>
-            Deactivate
-          </MenuItem>
-        ) : (
-          <MenuItem onClick={() => setConfirmationActivateOpen(true)}>
-            Activate
-          </MenuItem>
-        )}
       </Popover>
 
       {/* Confirmation Dialog */}
@@ -172,10 +149,10 @@ export default function UserTableRow({
         name={user.name}
         url={user.url}
         phone={user.phone}
+        bucketName={user.bucketName}
         role={user.role}
         fetchUsers={fetchUsers}
       />
-
     </>
   );
 }
@@ -187,4 +164,3 @@ UserTableRow.propTypes = {
   setcurentUser: PropTypes.any,
   currentDataRow: PropTypes.any,
 };
-
