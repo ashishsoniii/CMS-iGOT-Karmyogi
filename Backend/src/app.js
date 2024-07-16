@@ -2,6 +2,7 @@ const express = require("express");
 const authRoutes = require("./routes/authRoutes");
 const userManagementRoutes = require("./routes/userManagementRoutes");
 const websiteRoutes = require("./routes/WebsiteRoutes");
+const TextContentManagerGCP = require("./routes/TextContentManagerGCP");
 const cors = require("cors");
 const dbConfig = require("./config/database"); // Import the database configuration
 
@@ -16,6 +17,7 @@ app.use(cors());
 app.use("/auth", authRoutes);
 app.use("/user", userManagementRoutes);
 app.use("/website", websiteRoutes); 
+app.use("/web_gcp", TextContentManagerGCP); 
 
 app.get("/", (req, res) => {
   res.send("<h1>Home Page</h1>");
