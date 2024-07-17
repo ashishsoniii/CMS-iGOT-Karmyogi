@@ -17,64 +17,65 @@ import {
 } from "@mui/material";
 import axios from "axios";
 import JSONPretty from "react-json-prettify";
+import { diffChars } from "diff"; // import diffChars from 'diff' package
 
-function MultilingualEditor() {
+function TextManagerView() {
   const [languages, setLanguages] = useState([]);
-  const [selectedLanguage, setSelectedLanguage] = useState("en");
+  const [selectedLanguage, setSelectedLanguage] = useState("");
   const [content, setContent] = useState({});
-  const [selectedPageId, setSelectedPageId] = useState("page1"); // Updated to empty string initially
+  const [originalContent, setOriginalContent] = useState({});
+  const [selectedPageId, setSelectedPageId] = useState("page1");
   const [error, setError] = useState(null);
   const [successMessage, setSuccessMessage] = useState("");
   const [showJsonDialog, setShowJsonDialog] = useState(false);
+  const [showComparisonDialog, setShowComparisonDialog] = useState(false);
   const [pages, setPages] = useState([]);
 
   useEffect(() => {
     fetchPages();
-    fetchLanguages();
   }, []);
+
+  useEffect(() => {
+    if (selectedPageId) {
+      fetchContent(selectedPageId);
+    }
+  }, [selectedPageId]);
 
   const fetchPages = async () => {
     try {
-      const response = await axios.get(
-        `http://localhost:3001/web_gcp/folders`
-      );
+      const response = await axios.get(`http://localhost:3001/web_gcp/folders`);
       setPages(response.data);
-      setSelectedPageId(response.data[0] || ""); // Set default selected page
+      setSelectedPageId(response.data[0] || "");
     } catch (error) {
       console.error("Error fetching pages:", error);
       setError("Failed to fetch pages. Please try again.");
     }
   };
 
-  const fetchLanguages = async () => {
-    try {
-      // Simulated data until backend integration
-      setLanguages(["en", "hi"]);
-      setSelectedLanguage("en");
-      // Initial fetch of content with default language
-      fetchContent(selectedPageId, "en");
-    } catch (error) {
-      console.error("Error fetching languages:", error);
-      setError("Failed to fetch languages. Please try again.");
-    }
-  };
-
-  const fetchContent = async (pageId, lang) => {
+  const fetchContent = async (pageId) => {
     try {
       const response = await axios.get(
         `http://localhost:3001/web_gcp/content/${pageId}`
       );
-      setContent(response.data); // Assuming response.data structure matches content state expectation
+      const contentData = response.data;
+      setContent(contentData);
+      setOriginalContent(contentData);
+
+      // Extract available languages from the first field of the JSON content
+      const firstField = Object.keys(contentData)[0];
+      const availableLanguages = Object.keys(contentData[firstField]);
+      setLanguages(availableLanguages);
+      setSelectedLanguage(availableLanguages[0]); // Set default selected language
+
     } catch (error) {
-      console.error(`Error fetching content for ${lang}:`, error);
-      setError(`Failed to fetch content for ${lang}. Please try again.`);
+      console.error("Error fetching content:", error);
+      setError("Failed to fetch content. Please try again.");
     }
   };
 
   const handleLanguageChange = (event) => {
     const lang = event.target.value;
     setSelectedLanguage(lang);
-    fetchContent(selectedPageId, lang);
   };
 
   const handleFieldChange = (fieldName, value) => {
@@ -94,6 +95,7 @@ function MultilingualEditor() {
         content
       );
       setSuccessMessage("Content updated successfully!");
+      setOriginalContent(content); // Update original content after successful submission
     } catch (error) {
       console.error("Error updating content:", error);
       setError("Failed to update content. Please try again.");
@@ -113,10 +115,37 @@ function MultilingualEditor() {
     setShowJsonDialog(false);
   };
 
+  const handleShowComparison = () => {
+    setShowComparisonDialog(true);
+  };
+
+  const handleCloseComparisonDialog = () => {
+    setShowComparisonDialog(false);
+  };
+
   const handlePageChange = (event) => {
     const pageId = event.target.value;
     setSelectedPageId(pageId);
-    fetchContent(pageId, selectedLanguage);
+  };
+
+  const getDifferences = (original, updated) => {
+    const differences = {};
+    for (const key in updated) {
+      if (JSON.stringify(updated[key]) !== JSON.stringify(original[key])) {
+        differences[key] = updated[key];
+      }
+    }
+    return differences;
+  };
+
+  const differences = getDifferences(originalContent, content);
+
+  const getHighlightedText = (original, updated) => {
+    const diff = diffChars(original, updated);
+    return diff.map((part, index) => {
+      const style = part.added ? { backgroundColor: 'lightgreen' } : part.removed ? { backgroundColor: 'lightcoral' } : {};
+      return <span key={index} style={style}>{part.value}</span>;
+    });
   };
 
   return (
@@ -197,6 +226,13 @@ function MultilingualEditor() {
               <Button
                 variant="contained"
                 color="primary"
+                onClick={handleShowComparison}
+              >
+                Show Changes
+              </Button>
+              <Button
+                variant="contained"
+                color="primary"
                 onClick={handleSubmit}
               >
                 Submit
@@ -217,8 +253,50 @@ function MultilingualEditor() {
           </Button>
         </DialogActions>
       </Dialog>
+
+      <Dialog
+        open={showComparisonDialog}
+        onClose={handleCloseComparisonDialog}
+        fullWidth
+      >
+        <DialogTitle>Changes</DialogTitle>
+        <DialogContent>
+          <Typography variant="body1">
+            Differences between original and updated content:
+          </Typography>
+          <Grid container spacing={2}>
+            <Grid item xs={6}>
+              <Typography variant="h6">Original Content</Typography>
+              <div>
+                {Object.keys(originalContent).map((key) => (
+                  <div key={key}>
+                    <Typography variant="subtitle1">{key}:</Typography>
+                    <pre>{JSON.stringify(originalContent[key], null, 2)}</pre>
+                  </div>
+                ))}
+              </div>
+            </Grid>
+            <Grid item xs={6}>
+              <Typography variant="h6">Updated Content</Typography>
+              <div>
+                {Object.keys(content).map((key) => (
+                  <div key={key}>
+                    <Typography variant="subtitle1">{key}:</Typography>
+                    <pre>{getHighlightedText(JSON.stringify(originalContent[key], null, 2), JSON.stringify(content[key], null, 2))}</pre>
+                  </div>
+                ))}
+              </div>
+            </Grid>
+          </Grid>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseComparisonDialog} color="primary">
+            Close
+          </Button>
+        </DialogActions>
+      </Dialog>
     </div>
   );
 }
 
-export default MultilingualEditor;
+export default TextManagerView;
