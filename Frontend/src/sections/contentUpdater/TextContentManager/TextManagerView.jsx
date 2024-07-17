@@ -10,13 +10,10 @@ import {
   Typography,
   Paper,
   Snackbar,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
 } from "@mui/material";
 import axios from "axios";
-import JSONPretty from "react-json-prettify";
+import PageSelect from "./PageSelect";
+import Dialogs from "./Dialogs";
 import { diffChars } from "diff"; // import diffChars from 'diff' package
 
 function TextManagerView() {
@@ -61,11 +58,10 @@ function TextManagerView() {
       setContent(contentData);
       setOriginalContent(contentData);
 
-      // Extract available languages from the first field of the JSON content
       const firstField = Object.keys(contentData)[0];
       const availableLanguages = Object.keys(contentData[firstField]);
       setLanguages(availableLanguages);
-      setSelectedLanguage(availableLanguages[0]); // Set default selected language
+      setSelectedLanguage(availableLanguages[0]);
 
     } catch (error) {
       console.error("Error fetching content:", error);
@@ -95,7 +91,7 @@ function TextManagerView() {
         content
       );
       setSuccessMessage("Content updated successfully!");
-      setOriginalContent(content); // Update original content after successful submission
+      setOriginalContent(content);
     } catch (error) {
       console.error("Error updating content:", error);
       setError("Failed to update content. Please try again.");
@@ -159,21 +155,11 @@ function TextManagerView() {
       <Paper>
         <Grid container spacing={3} p={5}>
           <Grid item xs={12}>
-            <FormControl fullWidth>
-              <InputLabel id="page-select-label">Select Page</InputLabel>
-              <Select
-                labelId="page-select-label"
-                id="page-select"
-                value={selectedPageId}
-                onChange={handlePageChange}
-              >
-                {pages.map((page) => (
-                  <MenuItem key={page} value={page}>
-                    {page}
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
+            <PageSelect
+              pages={pages}
+              selectedPageId={selectedPageId}
+              handlePageChange={handlePageChange}
+            />
           </Grid>
           <Grid item xs={12}>
             <FormControl fullWidth>
@@ -242,59 +228,16 @@ function TextManagerView() {
         </Grid>
       </Paper>
 
-      <Dialog open={showJsonDialog} onClose={handleCloseJsonDialog} fullWidth>
-        <DialogTitle>Current JSON Content</DialogTitle>
-        <DialogContent>
-          <JSONPretty json={content} />
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleCloseJsonDialog} color="primary">
-            Close
-          </Button>
-        </DialogActions>
-      </Dialog>
-
-      <Dialog
-        open={showComparisonDialog}
-        onClose={handleCloseComparisonDialog}
-        fullWidth
-      >
-        <DialogTitle>Changes</DialogTitle>
-        <DialogContent>
-          <Typography variant="body1">
-            Differences between original and updated content:
-          </Typography>
-          <Grid container spacing={2}>
-            <Grid item xs={6}>
-              <Typography variant="h6">Original Content</Typography>
-              <div>
-                {Object.keys(originalContent).map((key) => (
-                  <div key={key}>
-                    <Typography variant="subtitle1">{key}:</Typography>
-                    <pre>{JSON.stringify(originalContent[key], null, 2)}</pre>
-                  </div>
-                ))}
-              </div>
-            </Grid>
-            <Grid item xs={6}>
-              <Typography variant="h6">Updated Content</Typography>
-              <div>
-                {Object.keys(content).map((key) => (
-                  <div key={key}>
-                    <Typography variant="subtitle1">{key}:</Typography>
-                    <pre>{getHighlightedText(JSON.stringify(originalContent[key], null, 2), JSON.stringify(content[key], null, 2))}</pre>
-                  </div>
-                ))}
-              </div>
-            </Grid>
-          </Grid>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleCloseComparisonDialog} color="primary">
-            Close
-          </Button>
-        </DialogActions>
-      </Dialog>
+      <Dialogs
+        showJsonDialog={showJsonDialog}
+        handleCloseJsonDialog={handleCloseJsonDialog}
+        content={content}
+        showComparisonDialog={showComparisonDialog}
+        handleCloseComparisonDialog={handleCloseComparisonDialog}
+        originalContent={originalContent}
+        differences={differences}
+        getHighlightedText={getHighlightedText}
+      />
     </div>
   );
 }
