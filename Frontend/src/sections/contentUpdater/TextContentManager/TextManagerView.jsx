@@ -187,32 +187,46 @@ function TextManagerView() {
         onClose={handleCloseSnackbar}
         message={error || successMessage}
       />
-      <Paper>
+      <Paper sx={{ p: 4, my: 5, borderRadius: 8 }}>
         <Box p={3}>
           <Grid container spacing={3}>
-            <Grid item xs={12}>
-              <PageSelect
-                pages={pages}
-                selectedPageId={selectedPageId}
-                handlePageChange={handlePageChange}
-              />
-            </Grid>
-            <Grid item xs={12}>
-              <Button
-                variant="contained"
-                color="primary"
-                onClick={() => fetchContent(selectedPageId)}
-                disabled={!selectedPageId}
-              >
-                Fetch Content
-              </Button>
-            </Grid>
+            <Paper
+              sx={{
+                p: 4,
+                my: 5,
+                borderRadius: 8,
+                width: "100%",
+                backgroundColor: "#fffbef",
+              }}
+            >
+              <Grid container spacing={3}>
+                <Grid item xs={12}>
+                  <PageSelect
+                    pages={pages}
+                    selectedPageId={selectedPageId}
+                    handlePageChange={handlePageChange}
+                  />
+                </Grid>
+                <Grid item xs={12}>
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    onClick={() => fetchContent(selectedPageId)}
+                    disabled={!selectedPageId}
+                  >
+                    Fetch Content
+                  </Button>
+                </Grid>
+              </Grid>
+            </Paper>
+
             <Grid item xs={12}>
               <FormControl fullWidth>
                 <InputLabel id="language-select-label">
                   Select Language
                 </InputLabel>
                 <Select
+                  label="Select Language"
                   labelId="language-select-label"
                   id="language-select"
                   value={selectedLanguage}

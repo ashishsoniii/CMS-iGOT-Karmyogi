@@ -40,14 +40,14 @@ function ContentUpdaterView() {
     <Container maxWidth="md" sx={{ mt: 4 }}>
       {selectedCard ? (
         <>
-          <Paper elevation={2} sx={{ p: 4 }}>
+          <Paper elevation={2} sx={{ p: 4, my:4, borderRadius:8 }}>
+              <Button variant="contained" onClick={handleBackClick}>
+                Back
+              </Button>
             <Box textAlign="center">
               <Typography variant="h5" gutterBottom>
                 {selectedCard} Selected
               </Typography>
-              <Button variant="contained" onClick={handleBackClick}>
-                Back
-              </Button>
             </Box>
           </Paper>
 
@@ -55,7 +55,7 @@ function ContentUpdaterView() {
         </>
       ) : (
         <>
-          <Paper elevation={2} sx={{ p: 4 }}>
+          <Paper elevation={2} sx={{ p: 4, my:5, borderRadius:8,   }}>
             <Typography variant="h4" align="center" gutterBottom>
               Content Updater
             </Typography>

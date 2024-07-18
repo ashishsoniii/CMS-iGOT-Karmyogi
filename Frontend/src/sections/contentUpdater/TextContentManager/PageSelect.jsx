@@ -6,7 +6,7 @@ function PageSelect({ pages, selectedPageId, handlePageChange }) {
     <FormControl fullWidth>
       <InputLabel id="page-select-label">Select Page</InputLabel>
       <Select
-        labelId="page-select-label"
+        label="Select Page"
         id="page-select"
         value={selectedPageId}
         onChange={handlePageChange}
