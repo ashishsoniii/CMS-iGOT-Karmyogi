@@ -62,7 +62,12 @@ function Dialogs({
                 {Object.keys(content).map((key) => (
                   <div key={key}>
                     <Typography variant="subtitle1">{key}:</Typography>
-                    <pre>{getHighlightedText(JSON.stringify(originalContent[key], null, 2), JSON.stringify(content[key], null, 2))}</pre>
+                    <pre>
+                      {getHighlightedText(
+                        JSON.stringify(originalContent[key] || '', null, 2),
+                        JSON.stringify(content[key] || '', null, 2)
+                      )}
+                    </pre>
                   </div>
                 ))}
               </div>
