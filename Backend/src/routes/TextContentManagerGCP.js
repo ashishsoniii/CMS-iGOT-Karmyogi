@@ -97,4 +97,24 @@ router.get("/content/:pageId", async (req, res) => {
   }
 });
 
+router.post("/folders", async (req, res) => {
+  const { pageId, initialContent } = req.body;
+
+  try {
+    const file_path = `${folderName}/${pageId}/${pageId}.json`;
+    const pageMetadata = new Page({ page_id: pageId, file_path: file_path });
+    await pageMetadata.save();
+
+    const file = bucket.file(file_path);
+    const content = JSON.stringify(initialContent);
+    await file.save(content);
+
+    res.status(200).send("Folder and page created successfully");
+  } catch (err) {
+    console.error("Error creating folder/page:", err);
+    res.status(500).send("Internal server error");
+  }
+});
+
+
 module.exports = router;
