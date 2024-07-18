@@ -13,12 +13,12 @@ import {
   Box,
   IconButton,
 } from "@mui/material";
-// import DeleteIcon from '@mui/icons-material/Delete';
 import axios from "axios";
 import PageSelect from "./PageSelect";
 import Dialogs from "./Dialogs";
 import { diffChars } from "diff";
 import delete_icon from "/public/icons/delete.png";
+import AddNewPage from "./AddNewPage";
 
 function TextManagerView() {
   const [languages, setLanguages] = useState([]);
@@ -29,29 +29,9 @@ function TextManagerView() {
   const [error, setError] = useState(null);
   const [successMessage, setSuccessMessage] = useState("");
   const [showJsonDialog, setShowJsonDialog] = useState(false);
-  const [newPageId, setNewPageId] = useState("");
   const [showComparisonDialog, setShowComparisonDialog] = useState(false);
   const [pages, setPages] = useState([]);
   const [newFieldName, setNewFieldName] = useState("");
-  const [initialContent, setInitialContent] = useState(`
-    {
-      "default_do_not_delete": {
-        "en": "new_title",
-        "hi": "नया शीर्षक",
-        "bn": "নতুন শিরোনাম",
-        "te": "కొత్త శీర్షిక",
-        "mr": "नवीन शीर्षक",
-        "ta": "புதிய தலைப்பு",
-        "ur": "نیا عنوان",
-        "gu": "નવું શીર્ષક",
-        "kn": "ಹೊಸ ಶೀರ್ಷಿಕೆ",
-        "or": "ନୂତନ ଶୀର୍ଷକ",
-        "ml": "പുതിയ തലക്കെട്ട്",
-        "pa": "ਨਵਾਂ ਸਿਰਲੇਖ",
-        "as": "নতুন শিৰোনাম"
-      }
-    }
-    `);
 
   useEffect(() => {
     fetchPages();
@@ -87,13 +67,6 @@ function TextManagerView() {
     }
   };
 
-  const handleNewPageChange = (event) => {
-    setNewPageId(event.target.value);
-  };
-  const handleInitialContentChange = (event) => {
-    setInitialContent(event.target.value);
-  };
-
   const handleLanguageChange = (event) => {
     const lang = event.target.value;
     setSelectedLanguage(lang);
@@ -109,11 +82,11 @@ function TextManagerView() {
     });
   };
 
-  const handleCreateNewPage = async () => {
+  const handleCreateNewPage = async (pageId, initialContent) => {
     try {
       const initialContentObject = JSON.parse(initialContent);
       await axios.post(`http://localhost:3001/web_gcp/folders`, {
-        pageId: newPageId,
+        pageId,
         initialContent: initialContentObject,
       });
       setSuccessMessage("New page created successfully!");
@@ -302,7 +275,6 @@ function TextManagerView() {
                       onClick={() => handleDeleteField(field)}
                       color="secondary"
                     >
-                      {/* <DeleteIcon /> */}
                       <img width={25} src={delete_icon} />
                     </IconButton>
                   </Grid>
@@ -359,48 +331,7 @@ function TextManagerView() {
           </Grid>
         </Box>
       </Paper>
-      <Paper
-        sx={{
-          p: 4,
-          my: 5,
-          borderRadius: 8,
-          width: "100%",
-        }}
-      >
-        <Box>
-          <Typography variant="h5" gutterBottom>
-            Add New Page
-          </Typography>
-        </Box>
-        <Grid item xs={12}>
-          <Box display="flex" alignItems="center">
-            <TextField
-              label="New Page ID"
-              value={newPageId}
-              onChange={handleNewPageChange}
-              fullWidth
-              variant="outlined"
-            />
-            {/* <TextField
-              label="Initial Content"
-              value={initialContent}
-              onChange={handleInitialContentChange}
-              fullWidth
-              variant="outlined"
-              style={{ marginLeft: "10px" }}
-            /> */}
-            <Button
-              onClick={handleCreateNewPage}
-              variant="contained"
-              color="primary"
-              style={{ marginLeft: "10px" }}
-            >
-              Create Page
-            </Button>
-          </Box>
-        </Grid>
-      </Paper>
-
+      <AddNewPage handleCreateNewPage={handleCreateNewPage} />
       <Dialogs
         showJsonDialog={showJsonDialog}
         handleCloseJsonDialog={handleCloseJsonDialog}
