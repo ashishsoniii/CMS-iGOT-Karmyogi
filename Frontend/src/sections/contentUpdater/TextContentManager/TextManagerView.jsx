@@ -11,11 +11,14 @@ import {
   Paper,
   Snackbar,
   Box,
+  IconButton,
 } from "@mui/material";
+// import DeleteIcon from '@mui/icons-material/Delete';
 import axios from "axios";
 import PageSelect from "./PageSelect";
 import Dialogs from "./Dialogs";
 import { diffChars } from "diff";
+import delete_icon from "/public/icons/delete.png";
 
 function TextManagerView() {
   const [languages, setLanguages] = useState([]);
@@ -142,6 +145,12 @@ function TextManagerView() {
     setNewFieldName("");
   };
 
+  const handleDeleteField = (fieldName) => {
+    const updatedContent = { ...content };
+    delete updatedContent[fieldName];
+    setContent(updatedContent);
+  };
+
   const getDifferences = (original, updated) => {
     const differences = {};
     for (const key in updated) {
@@ -157,8 +166,16 @@ function TextManagerView() {
   const getHighlightedText = (original, updated) => {
     const diff = diffChars(original, updated);
     return diff.map((part, index) => {
-      const style = part.added ? { backgroundColor: 'lightgreen' } : part.removed ? { backgroundColor: 'lightcoral' } : {};
-      return <span key={index} style={style}>{part.value}</span>;
+      const style = part.added
+        ? { backgroundColor: "lightgreen" }
+        : part.removed
+        ? { backgroundColor: "lightcoral" }
+        : {};
+      return (
+        <span key={index} style={style}>
+          {part.value}
+        </span>
+      );
     });
   };
 
@@ -212,12 +229,12 @@ function TextManagerView() {
             {Object.keys(content).map((field) => (
               <Grid item xs={12} key={field}>
                 <Grid container spacing={2} alignItems="center">
-                  <Grid item xs={4}>
+                  <Grid item xs={3}>
                     <Typography variant="h6" align="center">
                       {field}
                     </Typography>
                   </Grid>
-                  <Grid item xs={8}>
+                  <Grid item xs={7}>
                     <TextField
                       label={`Enter ${field} in ${selectedLanguage}`}
                       value={content[field][selectedLanguage] || ""}
@@ -226,11 +243,24 @@ function TextManagerView() {
                       fullWidth
                     />
                   </Grid>
+                  <Grid item xs={2}>
+                    <IconButton
+                      onClick={() => handleDeleteField(field)}
+                      color="secondary"
+                    >
+                      {/* <DeleteIcon /> */}
+                      <img width={25} src={delete_icon} />
+                    </IconButton>
+                  </Grid>
                 </Grid>
               </Grid>
             ))}
             <Grid item xs={12}>
-              <Grid container justifyContent="space-between" alignItems="center">
+              <Grid
+                container
+                justifyContent="space-between"
+                alignItems="center"
+              >
                 <Button
                   variant="contained"
                   color="primary"
