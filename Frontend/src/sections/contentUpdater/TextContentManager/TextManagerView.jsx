@@ -12,6 +12,7 @@ import {
   Snackbar,
   Box,
   IconButton,
+  CircularProgress,
 } from "@mui/material";
 import axios from "axios";
 import PageSelect from "./PageSelect";
@@ -35,6 +36,7 @@ function TextManagerView() {
   const [newFieldName, setNewFieldName] = useState("");
   const [showAddPageDialog, setShowAddPageDialog] = useState(false);
   const [showDeletePageDialog, setShowDeletePageDialog] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     fetchPages();
@@ -52,6 +54,7 @@ function TextManagerView() {
   };
 
   const fetchContent = async (pageId) => {
+    setLoading(true);
     try {
       const response = await axios.get(
         `http://localhost:3001/web_gcp/content/${pageId}`
@@ -68,6 +71,7 @@ function TextManagerView() {
       console.error("Error fetching content:", error);
       setError("Failed to fetch content. Please try again.");
     }
+    setLoading(false);
   };
 
   const handleLanguageChange = (event) => {
@@ -86,9 +90,10 @@ function TextManagerView() {
   };
 
   const handleCreateNewPage = async (pageId, initialContent) => {
+    setLoading(true);
     try {
       const initialContentObject = JSON.parse(initialContent);
-      await axios.post(`http://localhost:3001/web_gcp/folders`, {
+      await axios.post("http://localhost:3001/web_gcp/folders", {
         pageId,
         initialContent: initialContentObject,
       });
@@ -98,9 +103,11 @@ function TextManagerView() {
       console.error("Error creating new page:", error);
       setError("Failed to create new page. Please try again.");
     }
+    setLoading(false);
   };
 
   const handleDeletePage = async (pageId) => {
+    setLoading(true);
     try {
       await axios.delete(`http://localhost:3001/web_gcp/content/${pageId}`);
       setSuccessMessage("Page deleted successfully!");
@@ -112,9 +119,11 @@ function TextManagerView() {
       console.error("Error deleting page:", error);
       setError("Failed to delete page. Please try again.");
     }
+    setLoading(false);
   };
 
   const handleSubmit = async () => {
+    setLoading(true);
     try {
       await axios.post(
         `http://localhost:3001/web_gcp/content/${selectedPageId}`,
@@ -122,10 +131,12 @@ function TextManagerView() {
       );
       setSuccessMessage("Content updated successfully!");
       setOriginalContent(content);
+      resetForm();
     } catch (error) {
       console.error("Error updating content:", error);
       setError("Failed to update content. Please try again.");
     }
+    setLoading(false);
   };
 
   const handleCloseSnackbar = () => {
@@ -211,6 +222,12 @@ function TextManagerView() {
     });
   };
 
+  const resetForm = () => {
+    setContent({});
+    setOriginalContent({});
+    setSelectedLanguage(languages[0] || "");
+  };
+
   return (
     <div>
       <Snackbar
@@ -258,9 +275,13 @@ function TextManagerView() {
                         variant="contained"
                         color="success"
                         onClick={() => fetchContent(selectedPageId)}
-                        disabled={!selectedPageId}
+                        disabled={!selectedPageId || loading}
                       >
-                        Fetch Content
+                        {loading ? (
+                          <CircularProgress size={24} />
+                        ) : (
+                          "Fetch Content"
+                        )}
                       </Button>
                       <Button
                         variant="contained"
@@ -350,32 +371,41 @@ function TextManagerView() {
                   Show Changes
                 </Button>
                 <Button
+                  onClick={handleSubmit}
                   variant="contained"
                   color="success"
-                  onClick={handleSubmit}
+                  disabled={loading}
                 >
-                  Submit
+                  {loading ? <CircularProgress size={24} /> : "Submit"}
                 </Button>
               </Grid>
             </Grid>
-            <Grid item xs={12}>
-              <TextField
-                label="New Field Name"
-                value={newFieldName}
-                onChange={handleNewFieldChange}
-                variant="outlined"
-                fullWidth
-              />
-              <Button
-                variant="contained"
-                color="primary"
-                onClick={handleAddNewField}
-                disabled={!newFieldName.trim()}
-                sx={{ mt: 2 }}
-              >
-                Add New Field
-              </Button>
-            </Grid>
+
+            {Object.keys(content).length > 0 && (
+              <Grid item xs={12}>
+                <TextField
+                  label="New Field Name"
+                  value={newFieldName}
+                  onChange={handleNewFieldChange}
+                  variant="outlined"
+                  helperText={
+                    newFieldName.trim() === ""
+                      ? "Field name cannot be empty"
+                      : ""
+                  }
+                  fullWidth
+                />
+                <Button
+                  variant="contained"
+                  color="primary"
+                  onClick={handleAddNewField}
+                  disabled={!newFieldName.trim()}
+                  sx={{ mt: 2 }}
+                >
+                  Add New Field
+                </Button>
+              </Grid>
+            )}
           </Grid>
         </Box>
       </Paper>
