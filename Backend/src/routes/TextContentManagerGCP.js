@@ -116,5 +116,34 @@ router.post("/folders", async (req, res) => {
   }
 });
 
+// Route to delete a page
+router.delete("/content/:pageId", async (req, res) => {
+  const { pageId } = req.params;
+
+  try {
+    // Find page metadata in MongoDB
+    const pageMetadata = await Page.findOne({ page_id: pageId });
+
+    if (!pageMetadata) {
+      return res.status(404).send("Page metadata not found");
+    }
+
+    // Get file reference in GCS
+    const file = bucket.file(pageMetadata.file_path);
+
+    // Delete the file in GCS
+    await file.delete();
+
+    // Remove the page metadata from MongoDB
+    await Page.deleteOne({ page_id: pageId });
+
+    res.status(200).send("Page deleted successfully");
+  } catch (err) {
+    console.error("Error deleting page:", err);
+    res.status(500).send("Internal server error");
+  }
+});
+
+
 
 module.exports = router;

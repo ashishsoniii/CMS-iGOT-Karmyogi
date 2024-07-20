@@ -19,6 +19,7 @@ import Dialogs from "./Dialogs";
 import { diffChars } from "diff";
 import delete_icon from "/public/icons/delete.png";
 import AddNewPage from "./AddNewPage";
+import DeletePage from "./DeletePage";
 
 function TextManagerView() {
   const [languages, setLanguages] = useState([]);
@@ -32,6 +33,8 @@ function TextManagerView() {
   const [showComparisonDialog, setShowComparisonDialog] = useState(false);
   const [pages, setPages] = useState([]);
   const [newFieldName, setNewFieldName] = useState("");
+  const [showAddPageDialog, setShowAddPageDialog] = useState(false);
+  const [showDeletePageDialog, setShowDeletePageDialog] = useState(false);
 
   useEffect(() => {
     fetchPages();
@@ -94,6 +97,20 @@ function TextManagerView() {
     } catch (error) {
       console.error("Error creating new page:", error);
       setError("Failed to create new page. Please try again.");
+    }
+  };
+
+  const handleDeletePage = async (pageId) => {
+    try {
+      await axios.delete(`http://localhost:3001/web_gcp/content/${pageId}`);
+      setSuccessMessage("Page deleted successfully!");
+      fetchPages(); // Refresh the list of pages
+      if (pageId === selectedPageId) {
+        setSelectedPageId(pages[0] || "");
+      }
+    } catch (error) {
+      console.error("Error deleting page:", error);
+      setError("Failed to delete page. Please try again.");
     }
   };
 
@@ -216,6 +233,12 @@ function TextManagerView() {
             >
               <Grid container spacing={3}>
                 <Grid item xs={12}>
+                  <Box>
+                    <Typography variant="h5" gutterBottom>
+                      Select page
+                    </Typography>
+                  </Box>
+
                   <PageSelect
                     pages={pages}
                     selectedPageId={selectedPageId}
@@ -223,14 +246,39 @@ function TextManagerView() {
                   />
                 </Grid>
                 <Grid item xs={12}>
-                  <Button
-                    variant="contained"
-                    color="primary"
-                    onClick={() => fetchContent(selectedPageId)}
-                    disabled={!selectedPageId}
-                  >
-                    Fetch Content
-                  </Button>
+                  <Grid container spacing={2}>
+                    <Grid
+                      container
+                      justifyContent="space-between"
+                      alignItems="center"
+                      px={2}
+                    >
+                      {" "}
+                      <Button
+                        variant="contained"
+                        color="success"
+                        onClick={() => fetchContent(selectedPageId)}
+                        disabled={!selectedPageId}
+                      >
+                        Fetch Content
+                      </Button>
+                      <Button
+                        variant="contained"
+                        color="primary"
+                        onClick={() => setShowAddPageDialog(true)}
+                      >
+                        Add Page
+                      </Button>
+                      <Button
+                        onClick={() => setShowDeletePageDialog(true)}
+                        variant="contained"
+                        color="secondary"
+                        sx={{ mt: 2, ml: 2 }}
+                      >
+                        Delete Page
+                      </Button>
+                    </Grid>
+                  </Grid>
                 </Grid>
               </Grid>
             </Paper>
@@ -296,14 +344,14 @@ function TextManagerView() {
                 </Button>
                 <Button
                   variant="contained"
-                  color="primary"
+                  color="secondary"
                   onClick={handleShowComparison}
                 >
                   Show Changes
                 </Button>
                 <Button
                   variant="contained"
-                  color="primary"
+                  color="success"
                   onClick={handleSubmit}
                 >
                   Submit
@@ -331,7 +379,19 @@ function TextManagerView() {
           </Grid>
         </Box>
       </Paper>
-      <AddNewPage handleCreateNewPage={handleCreateNewPage} />
+      <AddNewPage
+        handleCreateNewPage={handleCreateNewPage}
+        open={showAddPageDialog}
+        onClose={() => setShowAddPageDialog(false)}
+      />
+      <DeletePage
+        open={showDeletePageDialog}
+        onClose={() => setShowDeletePageDialog(false)}
+        handleDeletePage={handleDeletePage}
+        pages={pages}
+        fetchedSelectedPageId={selectedPageId}
+      />
+
       <Dialogs
         showJsonDialog={showJsonDialog}
         handleCloseJsonDialog={handleCloseJsonDialog}
