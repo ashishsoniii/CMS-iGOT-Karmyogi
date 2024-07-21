@@ -8,6 +8,7 @@ import TextManagerView from "./TextContentManager/TextManagerView";
 function ContentUpdaterView() {
   const [websites, setWebsites] = useState([]);
   const [selectedWebsite, setSelectedWebsite] = useState("");
+  const [selectedWebsiteBucket, setSelectedWebsiteBucket] = useState("");
   const [selectedCard, setSelectedCard] = useState(""); // State to track which card is updated
 
   useEffect(() => {
@@ -18,7 +19,9 @@ function ContentUpdaterView() {
         );
         setWebsites(response.data);
         if (response.data.length > 0) {
+          console.log(response);
           setSelectedWebsite(response.data[0].url);
+          setSelectedWebsiteBucket(response.data[0].bucketName);
         }
       } catch (error) {
         console.error("Error fetching websites :", error);
@@ -40,10 +43,10 @@ function ContentUpdaterView() {
     <Container maxWidth="md" sx={{ mt: 4 }}>
       {selectedCard ? (
         <>
-          <Paper elevation={2} sx={{ p: 4, my:4, borderRadius:8 }}>
-              <Button variant="contained" onClick={handleBackClick}>
-                Back
-              </Button>
+          <Paper elevation={2} sx={{ p: 4, my: 4, borderRadius: 8 }}>
+            <Button variant="contained" onClick={handleBackClick}>
+              Back
+            </Button>
             <Box textAlign="center">
               <Typography variant="h5" gutterBottom>
                 {selectedCard} Selected
@@ -51,15 +54,19 @@ function ContentUpdaterView() {
             </Box>
           </Paper>
 
-          {selectedCard === "Text Content Manager" && <TextManagerView />}
+          {selectedCard === "Text Content Manager" && (
+            <TextManagerView selectedWebsiteBucket={selectedWebsiteBucket} />
+          )}
         </>
       ) : (
         <>
-          <Paper elevation={2} sx={{ p: 4, my:5, borderRadius:8,   }}>
+          <Paper elevation={2} sx={{ p: 4, my: 5, borderRadius: 8 }}>
             <Typography variant="h4" align="center" gutterBottom>
               Content Updater
             </Typography>
             <WebsiteSelector
+              // bucketName={bucketName}
+              setSelectedWebsiteBucket={setSelectedWebsiteBucket}
               websites={websites}
               selectedWebsite={selectedWebsite}
               setSelectedWebsite={setSelectedWebsite}
@@ -70,6 +77,14 @@ function ContentUpdaterView() {
               </Typography>
               <Typography variant="body1" color="textSecondary">
                 {selectedWebsite}
+              </Typography>
+            </Box>
+            <Box mt={1} textAlign="center">
+              <Typography variant="h6" gutterBottom>
+                Selected Website's Bucket
+              </Typography>
+              <Typography variant="body1" color="textSecondary">
+                {selectedWebsiteBucket}
               </Typography>
             </Box>
           </Paper>
