@@ -9,6 +9,16 @@ const navConfig = [
     path: "/user",
     icon: "user",
   },
+  {
+    title: "Websites",
+    path: "/websites",
+    icon: "web",
+  },
+  {
+    title: "Content Updater",
+    path: "/ContentUpdater",
+    icon: "doc",
+  },
 ];
 
 export default navConfig;
