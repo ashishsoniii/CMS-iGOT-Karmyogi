@@ -26,6 +26,25 @@ function MediaContentManager({ selectedWebsiteBucket }) {
     fetchPages();
   }, [selectedWebsiteBucket]);
 
+
+  const fetchContent = async (pageId) => {
+    setLoading(true);
+    try {
+      const response = await axios.get(
+        `http://localhost:3001/web_media_gcp/currfolders/${selectedWebsiteBucket}/${pageId}`
+      );
+      console.log(pageId)
+
+      setSuccessMessage("Content Fetched successfully!");
+      console.log(response)
+
+    } catch (error) {
+      console.error("Error fetching content:", error);
+      setError("Failed to fetch content. Please try again.");
+    }
+    setLoading(false);
+  };
+
   const fetchPages = async () => {
     try {
       const response = await axios.get(`http://localhost:3001/web_media_gcp/currfolders/${selectedWebsiteBucket}`);

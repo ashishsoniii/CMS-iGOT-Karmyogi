@@ -163,5 +163,66 @@ router.get("/currfolders/:bucketName", async (req, res) => {
   }
 });
 
+router.get("/currfolders/:bucketName/:folderName", async (req, res) => {
+  const { bucketName, folderName } = req.params;
+  const bucket = storage.bucket(bucketName);
+  const folderPath = `${mediaFolderName}/${folderName}/`;
+
+  try {
+    const options = {
+      prefix: folderPath,
+      delimiter: '/'
+    };
+
+    // List files and subdirectories in the specified folder
+    const [files, directories] = await bucket.getFiles(options);
+
+    // Debugging output
+    console.log("Files:", files);
+    console.log("Directories:", directories);
+
+    const result = {
+      files: [],
+      folders: []
+    };
+
+    // Ensure files and directories are properly defined
+    if (files && Array.isArray(files)) {
+      for (const file of files) {
+        const fileName = file.name.replace(folderPath, '');
+        const publicUrl = `https://storage.googleapis.com/${bucketName}/${file.name}`;
+        
+        // Fetch file metadata
+        const [metadata] = await file.getMetadata();
+        
+        result.files.push({
+          name: fileName,
+          url: publicUrl,
+          size: metadata.size,
+          contentType: metadata.contentType,
+          updated: metadata.updated
+        });
+      }
+    } else {
+      console.warn("Files are not defined or not an array.");
+    }
+
+    if (directories && Array.isArray(directories.prefixes)) {
+      directories.prefixes.forEach(folder => {
+        const folderName = folder.replace(folderPath, '').replace('/', '');
+        if (folderName) {
+          result.folders.push(folderName);
+        }
+      });
+    } else {
+      console.warn("Directories or directories.prefixes are not defined or not an array.");
+    }
+
+    res.status(200).json(result);
+  } catch (err) {
+    console.error("Error fetching folders and files:", err);
+    res.status(500).send("Internal server error");
+  }
+});
 
 module.exports = router;
