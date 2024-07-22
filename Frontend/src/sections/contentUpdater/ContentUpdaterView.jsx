@@ -4,6 +4,7 @@ import WebsiteSelector from "./WebsiteSelector";
 import { Container, Box, Typography, Paper, Grid, Button } from "@mui/material";
 import AppWidgetSummary from "./AppWidgetSummary";
 import TextManagerView from "./TextContentManager/TextManagerView";
+import MediaContentManager from "./MediaContentManager/MediaContentManager";
 
 function ContentUpdaterView() {
   const [websites, setWebsites] = useState([]);
@@ -56,6 +57,9 @@ function ContentUpdaterView() {
 
           {selectedCard === "Text Content Manager" && (
             <TextManagerView selectedWebsiteBucket={selectedWebsiteBucket} />
+          )}
+          {selectedCard === "Media Content Updater" && (
+            <MediaContentManager selectedWebsiteBucket={selectedWebsiteBucket} />
           )}
         </>
       ) : (

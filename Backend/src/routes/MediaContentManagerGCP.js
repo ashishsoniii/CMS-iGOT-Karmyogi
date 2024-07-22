@@ -32,6 +32,37 @@ router.post("/media/folders/:bucketName", async (req, res) => {
   }
 });
 
+// Route to delete a subfolder within media_content
+router.delete("/media/folders/:bucketName/:folderName", async (req, res) => {
+  const { bucketName, folderName } = req.params;
+  const bucket = storage.bucket(bucketName);
+  const folderPath = `${mediaFolderName}/${folderName}/`;
+
+  try {
+    // Check if the folder exists by listing files with the given prefix
+    const [files] = await bucket.getFiles({ prefix: folderPath });
+    
+    if (files.length === 0) {
+      return res.status(404).send("Folder not found");
+    }
+
+    // Delete all files within the folder
+    const deletePromises = files.map(file => file.delete());
+    await Promise.all(deletePromises);
+
+    res.status(200).send("Folder deleted successfully");
+  } catch (err) {
+    console.error("Error deleting subfolder:", err);
+    if (err.code === 404) {
+      res.status(404).send("Folder not found");
+    } else {
+      res.status(500).send(`Internal server error: ${err.message}`);
+    }
+  }
+});
+
+
+
 // Route to upload media content to a specified subfolder
 router.post("/media/upload/:bucketName/:folderName", upload.single("file"), async (req, res) => {
   const { bucketName, folderName } = req.params;
@@ -99,5 +130,38 @@ router.get("/media/list/:bucketName", async (req, res) => {
     res.status(500).send(`Internal server error: ${err.message}`);
   }
 });
+
+// Route to fetch folder names and subfolders/files for a specific folder
+router.get("/currfolders/:bucketName", async (req, res) => {
+  const { bucketName } = req.params;
+  const bucket = storage.bucket(bucketName);
+  
+  try {
+    const options = {
+      prefix: `${mediaFolderName}/`,
+      delimiter: "./"
+    };
+
+    // List files and subdirectories in the specified folder
+    const [files] = await bucket.getFiles(options);
+
+    const pages = {};
+
+    files.forEach(file => {
+      // Extract page names from file paths
+      const pathComponents = file.name.split("/");
+      if (pathComponents.length > 2) {
+        const pageId = pathComponents[1]; // Assuming page ID is the third component
+        pages[pageId] = true; // Use object to ensure unique page IDs
+      }
+    });
+
+    res.status(200).json(Object.keys(pages));
+  } catch (err) {
+    console.error("Error fetching pages:", err);
+    res.status(500).send("Internal server error");
+  }
+});
+
 
 module.exports = router;
