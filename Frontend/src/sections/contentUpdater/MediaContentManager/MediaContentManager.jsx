@@ -12,7 +12,7 @@ import axios from "axios";
 import FolderSelect from "./FolderSelect";
 import AddNewPage from "./AddNewFolder";
 import DeletePage from "./DeleteFolder";
-import UserPage from "./website/view/website-view";
+import UserPage from "./TableView/view/website-view";
 
 function MediaContentManager({ selectedWebsiteBucket }) {
   const [selectedPageId, setSelectedPageId] = useState("");
