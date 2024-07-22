@@ -15,6 +15,7 @@ import DeletePage from "./DeleteFolder";
 import UserPage from "./TableView/view/website-view";
 
 function MediaContentManager({ selectedWebsiteBucket }) {
+  const [contentFetchedPageId, setContentFetchedPageId] = useState("");
   const [selectedPageId, setSelectedPageId] = useState("");
   const [folderContent, setFolderContent] = useState(null);
   const [error, setError] = useState(null);
@@ -35,6 +36,7 @@ function MediaContentManager({ selectedWebsiteBucket }) {
         `http://localhost:3001/web_media_gcp/currfolders/${selectedWebsiteBucket}/${pageId}`
       );
       console.log(pageId);
+      setContentFetchedPageId(pageId);
 
       setSuccessMessage("Content Fetched successfully!");
       setFolderContent(response.data);
@@ -191,7 +193,12 @@ function MediaContentManager({ selectedWebsiteBucket }) {
         fetchedSelectedPageId={selectedPageId}
       />
 
-      {folderContent && <UserPage selectedPageId={selectedPageId} folderContent={folderContent} />}
+      {folderContent && (
+        <UserPage
+          selectedPageId={contentFetchedPageId}
+          folderContent={folderContent}
+        />
+      )}
     </div>
   );
 }
