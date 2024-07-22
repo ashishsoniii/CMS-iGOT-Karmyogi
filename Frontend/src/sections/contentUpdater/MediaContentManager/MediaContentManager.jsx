@@ -12,9 +12,11 @@ import axios from "axios";
 import FolderSelect from "./FolderSelect";
 import AddNewPage from "./AddNewFolder";
 import DeletePage from "./DeleteFolder";
+import UserPage from "./website/view/website-view";
 
 function MediaContentManager({ selectedWebsiteBucket }) {
   const [selectedPageId, setSelectedPageId] = useState("");
+  const [folderContent, setFolderContent] = useState(null);
   const [error, setError] = useState(null);
   const [successMessage, setSuccessMessage] = useState("");
   const [pages, setPages] = useState([]);
@@ -26,18 +28,17 @@ function MediaContentManager({ selectedWebsiteBucket }) {
     fetchPages();
   }, [selectedWebsiteBucket]);
 
-
   const fetchContent = async (pageId) => {
     setLoading(true);
     try {
       const response = await axios.get(
         `http://localhost:3001/web_media_gcp/currfolders/${selectedWebsiteBucket}/${pageId}`
       );
-      console.log(pageId)
+      console.log(pageId);
 
       setSuccessMessage("Content Fetched successfully!");
-      console.log(response)
-
+      setFolderContent(response.data);
+      console.log(response.data);
     } catch (error) {
       console.error("Error fetching content:", error);
       setError("Failed to fetch content. Please try again.");
@@ -47,7 +48,9 @@ function MediaContentManager({ selectedWebsiteBucket }) {
 
   const fetchPages = async () => {
     try {
-      const response = await axios.get(`http://localhost:3001/web_media_gcp/currfolders/${selectedWebsiteBucket}`);
+      const response = await axios.get(
+        `http://localhost:3001/web_media_gcp/currfolders/${selectedWebsiteBucket}`
+      );
       setPages(response.data);
       setSelectedPageId(response.data[0] || "");
     } catch (error) {
@@ -59,9 +62,12 @@ function MediaContentManager({ selectedWebsiteBucket }) {
   const handleCreateNewPage = async (newPageId) => {
     setLoading(true);
     try {
-      await axios.post(`http://localhost:3001/web_media_gcp/media/folders/${selectedWebsiteBucket}`, {
-        folderName: newPageId,
-      });
+      await axios.post(
+        `http://localhost:3001/web_media_gcp/media/folders/${selectedWebsiteBucket}`,
+        {
+          folderName: newPageId,
+        }
+      );
       setSuccessMessage("New folder created successfully!");
       fetchPages(); // Refresh the list of pages
     } catch (error) {
@@ -74,10 +80,12 @@ function MediaContentManager({ selectedWebsiteBucket }) {
   const handleDeletePage = async (pageId) => {
     setLoading(true);
     try {
-      await axios.delete(`http://localhost:3001/web_media_gcp/media/folders/${selectedWebsiteBucket}/${pageId}`);
+      await axios.delete(
+        `http://localhost:3001/web_media_gcp/media/folders/${selectedWebsiteBucket}/${pageId}`
+      );
       setSuccessMessage("Folder deleted successfully!");
       fetchPages(); // Refresh the list of pages
-        setSelectedPageId(pages[0] || "");
+      setSelectedPageId(pages[0] || "");
     } catch (error) {
       console.error("Error deleting page:", error);
       setError("Failed to delete folder. Please try again.");
@@ -182,6 +190,8 @@ function MediaContentManager({ selectedWebsiteBucket }) {
         pages={pages}
         fetchedSelectedPageId={selectedPageId}
       />
+
+      {folderContent && <UserPage selectedPageId={selectedPageId} folderContent={folderContent} />}
     </div>
   );
 }
