@@ -18,7 +18,7 @@ import axios from "axios";
 import PageSelect from "./PageSelect";
 import Dialogs from "./Dialogs";
 import { diffChars } from "diff";
-import delete_icon from "/public/icons/delete.png";
+import delete_icon from "/icons/delete.png";
 import AddNewPage from "./AddNewPage";
 import DeletePage from "./DeletePage";
 
