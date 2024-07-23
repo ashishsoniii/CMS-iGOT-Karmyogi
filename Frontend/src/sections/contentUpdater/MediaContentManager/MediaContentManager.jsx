@@ -45,6 +45,7 @@ function MediaContentManager({ selectedWebsiteBucket }) {
       );
       console.log(pageId);
       setContentFetchedPageId(pageId);
+      setContentFetchedPageId(pageId);
 
       setSuccessMessage("Content Fetched successfully!");
       setFolderContent(response.data);
