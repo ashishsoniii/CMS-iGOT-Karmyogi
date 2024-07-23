@@ -10,14 +10,16 @@ export default function WebsiteSelector({
   websites,
   selectedWebsite,
   setSelectedWebsite,
-  setSelectedWebsiteBucket
+  setSelectedWebsiteBucket,
 }) {
   const handleChange = (event) => {
-    const selectedWebsite = websites.find(website => website.url === event.target.value);
+    const selectedWebsite = websites.find(
+      (website) => website.url === event.target.value
+    );
     setSelectedWebsite(selectedWebsite.url);
     setSelectedWebsiteBucket(selectedWebsite.bucketName);
   };
-
+  S;
   return (
     <FormControl fullWidth variant="outlined" sx={{ mb: 4 }}>
       <InputLabel id="website-select-label">Select Website</InputLabel>

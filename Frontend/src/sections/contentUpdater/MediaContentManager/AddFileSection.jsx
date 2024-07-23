@@ -54,7 +54,7 @@ function AddFileSection({setSuccessMessage,fetchContent, selectedWebsiteBucket, 
 
       try {
         await axios.post(
-          `http://localhost:3001/web_media_gcp/media/upload/${selectedWebsiteBucket}/${selectedPageId}`,
+          `${import.meta.env.VITE_BACKEND_URL}/web_media_gcp/media/upload/${selectedWebsiteBucket}/${selectedPageId}`,
           formData,
           {
             headers: {

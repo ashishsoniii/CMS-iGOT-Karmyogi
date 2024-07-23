@@ -41,7 +41,7 @@ function MediaContentManager({ selectedWebsiteBucket }) {
     setLoading(true);
     try {
       const response = await axios.get(
-        `http://localhost:3001/web_media_gcp/currfolders/${selectedWebsiteBucket}/${pageId}`
+        `${import.meta.env.VITE_BACKEND_URL}/web_media_gcp/currfolders/${selectedWebsiteBucket}/${pageId}`
       );
       console.log(pageId);
       setContentFetchedPageId(pageId);
@@ -60,7 +60,7 @@ function MediaContentManager({ selectedWebsiteBucket }) {
   const fetchPages = async () => {
     try {
       const response = await axios.get(
-        `http://localhost:3001/web_media_gcp/currfolders/${selectedWebsiteBucket}`
+        `${import.meta.env.VITE_BACKEND_URL}/web_media_gcp/currfolders/${selectedWebsiteBucket}`
       );
       setPages(response.data);
       setSelectedPageId(response.data[0] || "");
@@ -74,7 +74,7 @@ function MediaContentManager({ selectedWebsiteBucket }) {
     setLoading(true);
     try {
       await axios.post(
-        `http://localhost:3001/web_media_gcp/media/folders/${selectedWebsiteBucket}`,
+        `${import.meta.env.VITE_BACKEND_URL}/web_media_gcp/media/folders/${selectedWebsiteBucket}`,
         {
           folderName: newPageId,
         }
@@ -91,7 +91,7 @@ function MediaContentManager({ selectedWebsiteBucket }) {
     setLoading(true);
     try {
       await axios.post(
-        `http://localhost:3001/web_media_gcp/media/folders/${selectedWebsiteBucket}`,
+        `${import.meta.env.VITE_BACKEND_URL}/web_media_gcp/media/folders/${selectedWebsiteBucket}`,
         {
           folderName: newPageId,
         }
@@ -109,7 +109,7 @@ function MediaContentManager({ selectedWebsiteBucket }) {
     setLoading(true);
     try {
       await axios.delete(
-        `http://localhost:3001/web_media_gcp/media/folders/${selectedWebsiteBucket}/${pageId}`
+        `${import.meta.env.VITE_BACKEND_URL}/web_media_gcp/media/folders/${selectedWebsiteBucket}/${pageId}`
       );
       setSuccessMessage("Folder deleted successfully!");
       fetchPages(); // Refresh the list of pages
