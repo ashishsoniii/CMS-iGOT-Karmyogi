@@ -15,7 +15,7 @@ import {
 import { CloudUpload, Delete, CheckCircle } from "@mui/icons-material";
 import axios from "axios";
 
-function AddFileSection({setSuccessMessage, selectedWebsiteBucket, selectedPageId }) {
+function AddFileSection({setSuccessMessage,fetchContent, selectedWebsiteBucket, selectedPageId }) {
   const [selectedFiles, setSelectedFiles] = useState([]);
   const [uploadStatus, setUploadStatus] = useState({});
 
@@ -66,6 +66,7 @@ function AddFileSection({setSuccessMessage, selectedWebsiteBucket, selectedPageI
           ...prevStatus,
           [file.name]: "success",
         }));
+        
 
         setSuccessMessage(`File ${file.name} uploaded successfully!`);
       } catch (error) {
@@ -76,6 +77,7 @@ function AddFileSection({setSuccessMessage, selectedWebsiteBucket, selectedPageI
         }));
       }
     }
+    fetchContent(selectedPageId);
   };
 
   return (

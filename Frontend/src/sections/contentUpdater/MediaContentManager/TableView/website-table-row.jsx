@@ -22,7 +22,7 @@ import { Box } from "@mui/material";
 
 // ----------------------------------------------------------------------
 
-export default function UserTableRow({ selected, id, user, fetchUsers }) {
+export default function UserTableRow({ fetchContent, selected, id, user, fetchUsers,selectedPageId, selectedWebsiteBucket,setSuccessMessage  }) {
   const [open, setOpen] = useState(null);
   const [isConfirmationDeleteOpen, setConfirmationOpen] = useState(false);
   const [isConfirmationActivateOpen, setConfirmationActivateOpen] =
@@ -40,27 +40,30 @@ export default function UserTableRow({ selected, id, user, fetchUsers }) {
     setConfirmationOpen(false); // Close the confirmation dialog
     try {
       const token = localStorage.getItem("token");
-
-      // Send DELETE request to delete the user
+  
+      // Send DELETE request to delete the file
       const response = await axios.delete(
-        `${import.meta.env.VITE_BACKEND_URL}/website/${id}`,
+        `${import.meta.env.VITE_BACKEND_URL}/web_media_gcp/media/delete/${selectedWebsiteBucket}/${selectedPageId}/${user.name}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
           },
         }
       );
-
-      // Refresh users after successful deletion
-      fetchUsers();
-      console.log("User deleted successfully:", response.data);
+      setSuccessMessage(`File ${user.name} Deleted Successfully`)
+  
+      // Refresh files after successful deletion
+      fetchContent(selectedPageId); // Ensure you have a function to fetch the updated list of files
+      console.log("File deleted successfully:", response.data);
     } catch (error) {
-      console.error("Error deleting user:", error);
-    }
+      console.error("Error deleting file:", error);
+      setSuccessMessage(`File ${user.name} Failed to Delete`)
 
+    }
+  
     setOpen(null);
   };
-
+  
   return (
     <>
       <TableRow hover tabIndex={-1} selected={selected}>

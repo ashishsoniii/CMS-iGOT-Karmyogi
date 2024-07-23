@@ -17,7 +17,10 @@ router.post("/media/folders/:bucketName", async (req, res) => {
 
   try {
     // Check if the folder already exists
-    const [existingFiles] = await bucket.getFiles({ prefix: folderPath, delimiter: '/' });
+    const [existingFiles] = await bucket.getFiles({
+      prefix: folderPath,
+      delimiter: "/",
+    });
     if (existingFiles.length > 0) {
       return res.status(400).send("Folder already exists");
     }
@@ -41,13 +44,13 @@ router.delete("/media/folders/:bucketName/:folderName", async (req, res) => {
   try {
     // Check if the folder exists by listing files with the given prefix
     const [files] = await bucket.getFiles({ prefix: folderPath });
-    
+
     if (files.length === 0) {
       return res.status(404).send("Folder not found");
     }
 
     // Delete all files within the folder
-    const deletePromises = files.map(file => file.delete());
+    const deletePromises = files.map((file) => file.delete());
     await Promise.all(deletePromises);
 
     res.status(200).send("Folder deleted successfully");
@@ -61,28 +64,57 @@ router.delete("/media/folders/:bucketName/:folderName", async (req, res) => {
   }
 });
 
-
-
 // Route to upload media content to a specified subfolder
-router.post("/media/upload/:bucketName/:folderName", upload.single("file"), async (req, res) => {
-  const { bucketName, folderName } = req.params;
-  const bucket = storage.bucket(bucketName);
-  const folderPath = `${mediaFolderName}/${folderName}/`;
+router.post(
+  "/media/upload/:bucketName/:folderName",
+  upload.single("file"),
+  async (req, res) => {
+    const { bucketName, folderName } = req.params;
+    const bucket = storage.bucket(bucketName);
+    const folderPath = `${mediaFolderName}/${folderName}/`;
 
-  const file = req.file; // This is set by multer
-  const filePath = `${folderPath}${file.originalname}`;
+    const file = req.file; // This is set by multer
+    const filePath = `${folderPath}${file.originalname}`;
 
-  try {
-    const gcsFile = bucket.file(filePath);
-    await gcsFile.save(file.buffer, {
-      contentType: file.mimetype,
-    });
-    res.status(200).send("Media content uploaded successfully");
-  } catch (err) {
-    console.error("Error uploading media content:", err);
-    res.status(500).send(`Internal server error: ${err.message}`);
+    try {
+      const gcsFile = bucket.file(filePath);
+      await gcsFile.save(file.buffer, {
+        contentType: file.mimetype,
+      });
+      res.status(200).send("Media content uploaded successfully");
+    } catch (err) {
+      console.error("Error uploading media content:", err);
+      res.status(500).send(`Internal server error: ${err.message}`);
+    }
   }
-});
+);
+
+// Route to delete media content from a specified subfolder
+router.delete(
+  "/media/delete/:bucketName/:folderName/:fileName",
+  async (req, res) => {
+    const { bucketName, folderName, fileName } = req.params;
+    const bucket = storage.bucket(bucketName);
+    const filePath = `${mediaFolderName}/${folderName}/${fileName}`;
+
+    try {
+      const file = bucket.file(filePath);
+
+      // Check if the file exists
+      const [exists] = await file.exists();
+      if (!exists) {
+        return res.status(404).send("File not found");
+      }
+
+      // Delete the file
+      await file.delete();
+      res.status(200).send("File deleted successfully");
+    } catch (err) {
+      console.error("Error deleting file:", err);
+      res.status(500).send(`Internal server error: ${err.message}`);
+    }
+  }
+);
 
 // Route to fetch everything in media_content folder
 router.get("/media/:bucketName", async (req, res) => {
@@ -115,7 +147,10 @@ router.get("/media/list/:bucketName", async (req, res) => {
   const folderPath = location ? `${location}/` : `${mediaFolderName}/`;
 
   try {
-    const [files] = await bucket.getFiles({ prefix: folderPath, delimiter: '/' });
+    const [files] = await bucket.getFiles({
+      prefix: folderPath,
+      delimiter: "/",
+    });
 
     const fileDetails = files.map((file) => ({
       name: file.name,
@@ -135,11 +170,11 @@ router.get("/media/list/:bucketName", async (req, res) => {
 router.get("/currfolders/:bucketName", async (req, res) => {
   const { bucketName } = req.params;
   const bucket = storage.bucket(bucketName);
-  
+
   try {
     const options = {
       prefix: `${mediaFolderName}/`,
-      delimiter: "./"
+      delimiter: "./",
     };
 
     // List files and subdirectories in the specified folder
@@ -147,7 +182,7 @@ router.get("/currfolders/:bucketName", async (req, res) => {
 
     const pages = {};
 
-    files.forEach(file => {
+    files.forEach((file) => {
       // Extract page names from file paths
       const pathComponents = file.name.split("/");
       if (pathComponents.length > 2) {
@@ -171,7 +206,7 @@ router.get("/currfolders/:bucketName/:folderName", async (req, res) => {
   try {
     const options = {
       prefix: folderPath,
-      delimiter: '/'
+      delimiter: "/",
     };
 
     // List files and subdirectories in the specified folder
@@ -183,24 +218,24 @@ router.get("/currfolders/:bucketName/:folderName", async (req, res) => {
 
     const result = {
       files: [],
-      folders: []
+      folders: [],
     };
 
     // Ensure files and directories are properly defined
     if (files && Array.isArray(files)) {
       for (const file of files) {
-        const fileName = file.name.replace(folderPath, '');
+        const fileName = file.name.replace(folderPath, "");
         const publicUrl = `https://storage.googleapis.com/${bucketName}/${file.name}`;
-        
+
         // Fetch file metadata
         const [metadata] = await file.getMetadata();
-        
+
         result.files.push({
           name: fileName,
           url: publicUrl,
           size: metadata.size,
           contentType: metadata.contentType,
-          updated: metadata.updated
+          updated: metadata.updated,
         });
       }
     } else {
@@ -208,14 +243,16 @@ router.get("/currfolders/:bucketName/:folderName", async (req, res) => {
     }
 
     if (directories && Array.isArray(directories.prefixes)) {
-      directories.prefixes.forEach(folder => {
-        const folderName = folder.replace(folderPath, '').replace('/', '');
+      directories.prefixes.forEach((folder) => {
+        const folderName = folder.replace(folderPath, "").replace("/", "");
         if (folderName) {
           result.folders.push(folderName);
         }
       });
     } else {
-      console.warn("Directories or directories.prefixes are not defined or not an array.");
+      console.warn(
+        "Directories or directories.prefixes are not defined or not an array."
+      );
     }
 
     res.status(200).json(result);

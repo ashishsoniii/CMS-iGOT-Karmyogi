@@ -24,6 +24,7 @@ import AddFileDialog from "../../AddFileSection";
 export default function UserPage({
   selectedPageId,
   folderContent,
+  fetchContent,
   setShowAddNewFileDialog,
   showAddNewFileDialog,
   selectedWebsiteBucket,
@@ -128,6 +129,7 @@ export default function UserPage({
     
 
       <AddFileDialog
+      fetchContent={fetchContent}
       setSuccessMessage={setSuccessMessage}
       selectedPageId={selectedPageId}
         selectedWebsiteBucket={selectedWebsiteBucket}
@@ -185,6 +187,10 @@ export default function UserPage({
                   .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                   .map((row) => (
                     <UserTableRow
+                          selectedPageId={selectedPageId}
+        selectedWebsiteBucket={selectedWebsiteBucket}
+        setSuccessMessage={setSuccessMessage}
+        fetchContent={fetchContent}
                       key={row._id}
                       id={row._id}
                       user={row}

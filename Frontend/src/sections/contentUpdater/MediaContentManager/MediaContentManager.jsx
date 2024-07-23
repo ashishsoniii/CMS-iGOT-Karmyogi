@@ -221,6 +221,7 @@ function MediaContentManager({ selectedWebsiteBucket }) {
 
       {folderContent && (
         <UserPage
+        fetchContent={fetchContent}
         setSuccessMessage={setSuccessMessage}
           showAddNewFileDialog={showAddNewFileDialog}
           selectedWebsiteBucket={selectedWebsiteBucket}
