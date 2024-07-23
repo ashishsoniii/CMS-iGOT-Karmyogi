@@ -12,21 +12,30 @@ import axios from "axios";
 import FolderSelect from "./FolderSelect";
 import AddNewPage from "./AddNewFolder";
 import DeletePage from "./DeleteFolder";
-import UserPage from "./website/view/website-view";
+import UserPage from "./TableView/view/gcp-table-content-view";
+import AddFileDialog from "./AddFileSection";
 
 function MediaContentManager({ selectedWebsiteBucket }) {
+  const [contentFetchedPageId, setContentFetchedPageId] = useState("");
   const [selectedPageId, setSelectedPageId] = useState("");
   const [folderContent, setFolderContent] = useState(null);
   const [error, setError] = useState(null);
   const [successMessage, setSuccessMessage] = useState("");
   const [pages, setPages] = useState([]);
   const [showAddPageDialog, setShowAddPageDialog] = useState(false);
+  const [showAddNewFileDialog, setShowAddNewFileDialog] = useState(false);
   const [showDeletePageDialog, setShowDeletePageDialog] = useState(false);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     fetchPages();
   }, [selectedWebsiteBucket]);
+
+  useEffect(() => {
+    setShowAddNewFileDialog(false);
+    setFolderContent(null);
+
+  }, [selectedPageId]);
 
   const fetchContent = async (pageId) => {
     setLoading(true);
@@ -35,6 +44,7 @@ function MediaContentManager({ selectedWebsiteBucket }) {
         `http://localhost:3001/web_media_gcp/currfolders/${selectedWebsiteBucket}/${pageId}`
       );
       console.log(pageId);
+      setContentFetchedPageId(pageId);
 
       setSuccessMessage("Content Fetched successfully!");
       setFolderContent(response.data);
@@ -60,6 +70,23 @@ function MediaContentManager({ selectedWebsiteBucket }) {
   };
 
   const handleCreateNewPage = async (newPageId) => {
+    setLoading(true);
+    try {
+      await axios.post(
+        `http://localhost:3001/web_media_gcp/media/folders/${selectedWebsiteBucket}`,
+        {
+          folderName: newPageId,
+        }
+      );
+      setSuccessMessage("New folder created successfully!");
+      fetchPages(); // Refresh the list of pages
+    } catch (error) {
+      console.error("Error creating new page:", error);
+      setError("Failed to create new folder. Please try again.");
+    }
+    setLoading(false);
+  };
+  const handleCreateNewFile = async (newPageId) => {
     setLoading(true);
     try {
       await axios.post(
@@ -191,7 +218,17 @@ function MediaContentManager({ selectedWebsiteBucket }) {
         fetchedSelectedPageId={selectedPageId}
       />
 
-      {folderContent && <UserPage selectedPageId={selectedPageId} folderContent={folderContent} />}
+      {folderContent && (
+        <UserPage
+        setSuccessMessage={setSuccessMessage}
+          showAddNewFileDialog={showAddNewFileDialog}
+          selectedWebsiteBucket={selectedWebsiteBucket}
+          handleCreateNewFile={handleCreateNewFile}
+          setShowAddNewFileDialog={setShowAddNewFileDialog}
+          selectedPageId={contentFetchedPageId}
+          folderContent={folderContent}
+        />
+      )}
     </div>
   );
 }

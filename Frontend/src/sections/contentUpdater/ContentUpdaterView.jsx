@@ -41,7 +41,7 @@ function ContentUpdaterView() {
   };
 
   return (
-    <Container maxWidth="md" sx={{ mt: 4 }}>
+    <Container sx={{ mt: 4 }}>
       {selectedCard ? (
         <>
           <Paper elevation={2} sx={{ p: 4, my: 4, borderRadius: 8 }}>
@@ -59,7 +59,9 @@ function ContentUpdaterView() {
             <TextManagerView selectedWebsiteBucket={selectedWebsiteBucket} />
           )}
           {selectedCard === "Media Content Updater" && (
-            <MediaContentManager selectedWebsiteBucket={selectedWebsiteBucket} />
+            <MediaContentManager
+              selectedWebsiteBucket={selectedWebsiteBucket}
+            />
           )}
         </>
       ) : (

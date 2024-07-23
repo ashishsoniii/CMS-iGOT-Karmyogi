@@ -17,10 +17,19 @@ import UserTableHead from "../website-table-head";
 import UserTableToolbar from "../website-table-toolbar";
 import AppWidgetSummary from "../app-widget-summary";
 import { applyFilter, getComparator } from "../utils";
+import AddFileDialog from "../../AddFileSection";
 
 // ----------------------------------------------------------------------
 
-export default function UserPage({selectedPageId, folderContent }) {
+export default function UserPage({
+  selectedPageId,
+  folderContent,
+  setShowAddNewFileDialog,
+  showAddNewFileDialog,
+  selectedWebsiteBucket,
+  handleCreateNewFile,
+  setSuccessMessage
+}) {
   const [page, setPage] = useState(0);
   const [users, setusers] = useState(folderContent.files);
   const [order, setOrder] = useState("asc");
@@ -106,7 +115,26 @@ export default function UserPage({selectedPageId, folderContent }) {
         m={6}
       >
         <Typography variant="h4">{selectedPageId} Folder's File</Typography>
+        <Button
+          variant="contained"
+          color="primary"
+          onClick={() => setShowAddNewFileDialog(true)}
+        >
+          Add Files
+        </Button>
       </Stack>
+
+   { showAddNewFileDialog && 
+    
+
+      <AddFileDialog
+      setSuccessMessage={setSuccessMessage}
+      selectedPageId={selectedPageId}
+        selectedWebsiteBucket={selectedWebsiteBucket}
+        // open={showAddNewFileDialog}
+        // onClose={() => setShowAddNewFileDialog(false)}
+        handleCreateNewFile={handleCreateNewFile}
+      />}
 
       <>
         <Card
